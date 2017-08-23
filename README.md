@@ -1,0 +1,2 @@
+# UploadPreview
+UploadPreview是一个基于百度（Baidu） WebFE(FEX)团队开发的WebUploader的文件(图片)上传预览插件！ UploadPreview可以让您在Web开发中快速实现一个图片上传前预览、多文件异步上传的功能。 UploadPreview提供了一些实用的方法及事件回调供开发者使用，当然UploadPreview也提供了很多的配置参数供开发者去配置以达到插件与实际项目需求紧密结合、灵活使用的效果！
