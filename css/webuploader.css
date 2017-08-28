@@ -1,0 +1,262 @@
+@charset "utf-8";
+p{
+	padding: 0;
+	margin: 0;
+}
+/*web uploader 自动生成的图片样式 start*/
+._filelist {
+	margin: 0;
+	padding: 0;
+}
+._filelist:after {
+	content: '';
+	display: block;
+	width: 0;
+	height: 0;
+	overflow: hidden;
+	clear: both;
+}
+._filelist .preview-box {
+	width: 180px;
+	height: 130px;
+	background: url(../images/bg.png) repeat;
+	text-align: center;
+	margin: 0 8px 20px 0;
+	position: relative;
+	display: inline;
+	float: left;
+	overflow: hidden;
+	font-size: 12px;
+}
+._filelist .preview-box .log {
+	position: relative;
+	top: -45px;
+}
+._filelist .preview-box .title {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	visibility: hidden;
+	top: 5px;
+	text-indent: 5px;
+	text-align: left;
+}
+._filelist .preview-box .progress {
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	left: 0;
+	height: 8px;
+	overflow: hidden;
+	z-index: 50;
+	margin: 0;
+	border-radius: 0;
+	background: none;
+	-webkit-box-shadow: none;
+}
+._filelist .preview-box .progress span {
+	display: block;
+	overflow: hidden;
+	width: 0;
+	height: 100%;
+	background: #1483d8 url(../images/progress.png) repeat-x;
+	-webit-transition: width 200ms linear;
+	-moz-transition: width 200ms linear;
+	-o-transition: width 200ms linear;
+	-ms-transition: width 200ms linear;
+	transition: width 200ms linear;
+	-webkit-animation: progressmove 2s linear infinite;
+	-moz-animation: progressmove 2s linear infinite;
+	-o-animation: progressmove 2s linear infinite;
+	-ms-animation: progressmove 2s linear infinite;
+	animation: progressmove 2s linear infinite;
+	-webkit-transform: translateZ(0);
+}
+/* 进度条动画 start */
+@-webkit-keyframes progressmove {
+	0% {
+		background-position: 0 0;
+	}
+	100% {
+		background-position: 17px 0;
+	}
+}
+@-moz-keyframes progressmove {
+	0% {
+		background-position: 0 0;
+	}
+	100% {
+		background-position: 17px 0;
+	}
+}
+@keyframes progressmove {
+	0% {
+		background-position: 0 0;
+	}
+	100% {
+		background-position: 17px 0;
+	}
+}
+/* 进度条动画 end */
+._filelist .preview-box .imgWrap {
+	width: 100%;
+	height: 100%;
+	z-index: 2;
+	vertical-align: middle;
+	overflow: hidden;
+	-webkit-transform-origin: 50% 50%;
+	-moz-transform-origin: 50% 50%;
+	-o-transform-origin: 50% 50%;
+	-ms-transform-origin: 50% 50%;
+	transform-origin: 50% 50%;
+	-webit-transition: 200ms ease-out;
+	-moz-transition: 200ms ease-out;
+	-o-transition: 200ms ease-out;
+	-ms-transition: 200ms ease-out;
+	transition: 200ms ease-out;
+}
+._filelist .preview-box .previewing{
+	position: absolute;
+	top: 50%;
+	left: 0;
+	width: 100%;
+	font-weight: 600;
+	letter-spacing: 1px;
+	text-align: center;
+
+}
+._filelist .preview-box img{
+	-webkit-transform-origin: 50% 50%;
+	-moz-transform-origin: 50% 50%;
+	-o-transform-origin: 50% 50%;
+	-ms-transform-origin: 50% 50%;
+	transform-origin: 50% 50%;
+	-webit-transition: 200ms ease-out;
+	-moz-transition: 200ms ease-out;
+	-o-transition: 200ms ease-out;
+	-ms-transition: 200ms ease-out;
+	transition: 200ms ease-out;
+}
+/* ._filelist .preview-box img {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+} */
+._filelist .preview-box .not-support-preview{
+	font-size: 14px;
+	padding: 10px 8px;
+}
+._filelist .preview-box .error {
+	background: #f43838;
+	color: #fff;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	height: 28px;
+	line-height: 28px;
+	width: 100%;
+	z-index: 100;
+}
+._filelist .preview-box .retry-this,
+._filelist .preview-box .del-this{
+	color: #d0d0d0;
+	text-decoration: none;
+}
+._filelist .preview-box .retry-this:hover,
+._filelist .preview-box .del-this:hover{
+	color: #fff;
+	text-decoration: none;
+}
+._filelist .preview-box .success {
+	display: block;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 40px;
+	width: 100%;
+	z-index: 200;
+	background: url(../images/success.png) no-repeat right bottom;
+}
+._filelist div.file-panel {
+	position: absolute;
+	height: 0;
+	filter: progid: DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr='#80000000', endColorstr='#80000000')\0;
+	background: rgba( 0, 0, 0, 0.5);
+	background-color: #000\9;
+	filter: alpha(opacity=50)\9;
+	width: 100%;
+	top: 0;
+	left: 0;
+	overflow: hidden;
+	z-index: 300;
+}
+._filelist div.file-panel span {
+	width: 24px;
+	height: 24px;
+	display: inline;
+	float: right;
+	text-indent: -9999px;
+	overflow: hidden;
+	background: url(../images/webuploader-icons.png) no-repeat;
+	margin: 5px 1px 1px;
+	cursor: pointer;
+}
+._filelist div.file-panel span.rotateLeft {
+	background-position: 0 -24px;
+}
+._filelist div.file-panel span.rotateLeft:hover {
+	background-position: 0 0;
+}
+._filelist div.file-panel span.rotateRight {
+	background-position: -24px -24px;
+}
+._filelist div.file-panel span.rotateRight:hover {
+	background-position: -24px 0;
+}
+._filelist div.file-panel span.cancel {
+	background-position: -48px -24px;
+}
+._filelist div.file-panel span.cancel:hover {
+	background-position: -48px 0;
+}
+/*web uploader 自动生成的图片样式 end*/
+
+.webuploader-container {
+	position: relative;
+}
+.webuploader-container.unable-btn .webuploader-pick{
+	background-color: #94dff5;
+	color: #eee;
+	cursor: default;
+}
+.webuploader-element-invisible {
+	position: absolute !important;
+	clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+    clip: rect(1px,1px,1px,1px);
+}
+/*"选折图片"按钮的大小就是这个webuploader-pick的大小*/
+.webuploader-pick {
+	position: relative;
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	cursor: pointer;
+	background: #00b7ee;
+	/* padding: 10px 15px; */
+	color: #fff;
+	text-align: center;
+	border-radius: 3px;
+	overflow: hidden;
+}
+.webuploader-pick-hover {
+	background: #00a2d4;
+}
+.webuploader-pick-disable {
+	background-color: #94dff5;
+	color: #eee;
+	pointer-events:none;
+}

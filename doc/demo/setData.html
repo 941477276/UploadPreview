@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+     <link rel="stylesheet" href="../../css/webuploader.css" />
+     <style>
+         .preview-list{
+            width: 1200px;
+            min-height: 200px;
+            padding: 20px;
+            border: 1px dashed #666;
+            margin: 50px auto;
+         }
+        
+        .btn-wrap{
+            width: 1200px;
+            margin: 20px auto;
+        }
+         .choose-file{
+            width: 200px;
+            height: 80px;
+            margin-bottom: 20px;
+         }
+     </style>
+</head>
+<body>
+    <div class="preview-list"> </div>
+
+    <div class="btn-wrap">
+        <div class="choose-file"></div>
+        <button id="setData_btn" type="button">设置额外参数</button>
+        <button id="upload_btn" type="button">立即上传</button>
+        <button id="retry_btn" type="button">重新上传</button>
+    </div>
+    
+
+
+    <script src="../../jquery-1.11.3.min.js"></script>
+    <script src="../../webuploader.js"></script>
+    <script src="../../UploadPreview.js"></script>
+    <input type="hidden" id="uloader_swf" value="../../Uploader.swf" />
+    <script>
+       var uploadPreview = new UploadPreview({
+            url: "upload.php",
+            swf: document.getElementById("uloader_swf"),
+            previewInfo: {
+                previewWrap: ".preview-list"
+            },
+            btns: {
+                chooseBtn: ".choose-file",
+                chooseBtnText: "选择文件",
+                retryBtn: document.getElementById("retry_btn")
+            },
+            fileQueued: function (file){
+                //通过调试工具查看请求参数，就可以看到该额外数据了
+                //给选择的文件添加一个额外参数uuid
+                uploadPreview.setData(file, {
+                    uuid: "_" + new Date().getTime()
+                });
+            },
+            uploadError: function (file,reason){
+                console.log('上传失败代码：' + reason);
+            },
+            uploadSuccess: function (file,response){
+                //这里的上传成功指的是上传请求发送成功，图片是否真正上传到服务还得根据服务器返回的数据(response)来判断
+                consoel.log(response);
+            }
+        });
+
+
+       $("#setData_btn").on("click", function (){
+            //给选择的所有文件都添加
+            uploadPreview.setData({
+                common: "所有文件都会添加该数据"
+            });
+            this.dataAdded = true;
+       });
+       $("#upload_btn").on("click", function (){
+            if(!document.getElementById("setData_btn").dataAdded){
+                alert("请先点击\"设置额外参数\"按钮！");
+                return;
+            }
+            uploadPreview.upload();
+       });
+    </script>
+</body>
+</html>

@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" id="viewport" name="viewport">
+    <meta name="format-detection" content="telephone=notelphone=no, email=no" />
+    <meta name="description" content="" />
+    <meta name="wap-font-scale" content="no"><!--uc浏览器判断到页面上文字居多时，会自动放大字体优化移动用户体验。这个可以禁止掉-->
+    <meta name="keywords" content="" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <meta name="apple-touch-fullscreen" content="yes"/><!-- 是否启用 WebApp 全屏模式，删除苹果默认的工具栏和菜单栏 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/><!-- 设置苹果工具栏颜色:默认值为 default，可以定为 black和 black-translucent-->
+    <meta http-equiv="Cache-Control" content="no-siteapp" /><!-- 不让百度转码 -->
+    <meta name="HandheldFriendly" content="true"><!-- 针对手持设备优化，主要是针对一些老的不识别viewport的浏览器，比如黑莓 -->
+    <meta name="MobileOptimized" content="320"><!-- 微软的老式浏览器 -->
+    <meta name="screen-orientation" content="portrait"><!-- uc强制竖屏 -->
+    <meta name="x5-orientation" content="portrait"><!-- QQ强制竖屏 -->
+    <meta name="x5-page-mode" content="app"><!-- QQ应用模式 -->
+    <meta name="msapplication-tap-highlight" content="no"><!-- windows phone 点击无高光 -->
+    <meta name="apple-mobile-web-app-capable" content="yes"><!-- ios 开启对web app程序的支持 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"><!-- ios 改变顶部状态条的颜色 -->
+    <title>Document</title>
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="bootstrap-treeview/css/bootstrap-treeview.min.css" />
+    <link rel="stylesheet" href="../css/webuploader.css" /><!-- 必须引入的css -->
+    <link rel="stylesheet" href="highlight/styles/default.css" />
+    <link rel="stylesheet" href="../css/doc.css" />
+    <script src="highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    
+
+    <div class="container">
+        <div class="row">
+            <div class="header-fixed">
+                <h1>UploadPreview API文档</h1>
+                <p class="remark">注：UploadPreview插件依赖于百度的 WebUploader(
+                    <a href="http://fex.baidu.com/webuploader/" title="UploadPreview插件依赖于百度的WebUploader" target="_blank">
+                        http://fex.baidu.com/webuploader/
+                    </a>
+                    ) 插件！
+                </p>
+            </div>
+            <div class="main clearfix">
+                <div class="pull-left menu-tree scrollspy" id="menu_tree">
+                    <ul id="nav" class="nav" data-spy="affix">
+                        <li><a href="#anchor_UploadPreview">初始化</a>
+                        </li>
+                        <li>
+                            <a href="#anchor_params">参数配置</a>
+                        </li>
+                        <li><a href="#anchor_event">事件说明</a>
+                        </li>
+                        <li>
+                            <a href="#anchor_method">方法</a>
+                            <ul class="nav">
+                                <li>
+                                    <a href="#anchor_upload">upload</a>
+                                </li>
+                               <li>
+                                    <a href="#anchor_stop">stop</a>
+                                </li>
+                                <li>
+                                    <a href="#anchor_retry">retry</a>
+                                </li>
+                                <li>
+                                    <a href="#anchor_destroy">destroy</a>
+                                </li>
+                                <li>
+                                    <a href="#anchor_delete">delete</a>
+                                </li>
+                                <li>
+                                    <a href="#anchor_refresh">refresh</a>
+                                </li>
+                                <li>
+                                    <a href="#anchor_disable">disable</a>
+                                </li>
+                                <li>
+                                    <a href="#anchor_enable">enable</a>
+                                </li>
+                                <li>
+                                    <a href="#anchor_setData">setData</a>
+                                </li>
+                                <li>
+                                    <a href="#anchor_getFiles">getFiles</a>
+                                </li>
+                                <li>
+                                    <a href="#anchor_getStats">getStats</a>
+                                </li>
+                                <li>
+                                    <a href="#anchor_getFileLength">getFileLength</a>
+                                </li>
+                                <li>
+                                    <a href="#anchor_calculateWh">calculateWh</a>
+                                </li>
+                                <li>
+                                    <a href="#anchor_setProgressWidth">setProgressWidth</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <div>
+                        <h3 id="anchor_UploadPreview">UploadPreview</h3>
+                        <pre>
+                            <code class="javascript">
+        var uploader = new UploadPreview({
+            swf: "Uploader.swf",//Uploader.swf文件的路径
+            url: "upload.php",//图片上传到后端的地址
+            previewInfo: {//预览参数配置
+                previewWrap: ".file-list"//包裹所有预览图片的父级元素
+            },
+            btns: {//按钮配置
+                // 指定选择文件的按钮容器，选择器支持 id, class, dom。
+                chooseBtn: document.getElementById("choose_file"),
+                //选择文件按钮显示的文字
+                chooseBtnText: "选择图片",
+            }
+       });
+                            </code>
+                        </pre>
+                        <p class="effect-demo-title clearfix">
+                            效果演示
+                            <a href="demo/basic.html" target="_blank" class="new-page">新标签查看</a>
+                        </p>
+                        <div class="file-list"></div>
+                        <div class="choose-file-btn" id="UploadPreview_chooseBtn"></div>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_params">参数配置</h3>
+                        <ul class="param-list">
+                            <li>
+                                <code>swf</code>{string} [必填] <span class="mr-5">[默认: "Uploader.swf"]
+                                Uploader.swf文件的路径，如果该路径填写不正确则在IE9及以下浏览器不能预览及上传文件！
+                            </li>
+                            <li>
+                                <code>url</code>{string} [必填] <span class="mr-5">[默认: "upload.php"]
+                                文件上传到后端的URL
+                            </li>
+                            <li>
+                                <code>fileVal</code>{string} [可选] <span class="mr-5">[默认: "file"]
+                                文件上传域的name，即后端接收文件的名称
+                            </li>
+                            <li>
+                                <code>method</code>{string} [可选] <span class="mr-5">[默认: "post"]
+                                上传文件时的请求类型
+                            </li>
+                            <li>
+                                <code>pictureOnly</code>{Boolean} [可选] <span class="mr-5">[默认: true]
+                                是否只能选择图片，若设置为true则用户在选择文件时就只能选择图片，不能选择其他类型的文件。若设置为false则允许用户选择其他类型的文件
+                            </li>
+                            <li>
+                                <code>multiple</code>{Boolean} [可选] <span class="mr-5">[默认: true]
+                                是否允许选择、上传多张图片
+                            </li>
+                            <li>
+                                <code>auto</code>{Boolean} [可选] <span class="mr-5">[默认: false]
+                                是否自动上传文件，若设置为true则在用户选定文件后立即上传该文件
+                            </li>
+                            <li>
+                                <code>datas</code>{Object} [可选] <span class="mr-5">[默认: null]
+                                上传时需要给文件添加的额外参数，若设置了参数则每一个文件在上传时都会将<code>datas</code>里面的数据传递给后台
+                            </li>
+                            <li>
+                                <code>threads</code>{int} [可选] <span class="mr-5">[默认: 3]
+                                上传并发数。允许同时最大上传进程数。
+                            </li>
+                            <li>
+                                <code>previewInfo</code>预览框相关配置
+                                <ul>
+                                    <li>
+                                        <code>width</code> {int} [可选] <span class="mr-5">[默认: -1]</span> 预览框的宽度，。如果不设置或设置为-1，则默认为预览框渲染的宽度
+                                    </li>
+                                    <li>
+                                        <code>height</code>{int} [可选] <span class="mr-5">[默认: -1]</span>
+                                        预览框的高度度，如果不设置或设置为-1，则默认为预览框渲染的高度
+                                    </li>
+                                    <li>
+                                        <code>viewImgHorizontal</code>
+                                        {Boolean} [可选] <span class="mr-5">[默认: true]</span>
+                                        预览图对于预览框是否水平垂直居中，如果值为false则预览图的position默认为static，
+                                        如果值为true则预览图的position为absolute。最终它的css为
+                                        <pre>
+                                            <code class="css">
+        ._filelist .preview-box img{
+            position: aboslute;
+            top: 50%;
+            left: 50%;
+            margin-top: -图片自身高度的一半;
+            margin-left: -图片自身宽度的一半;
+        }
+                                            </code>
+                                        </pre>
+                                    </li>
+                                    <li>
+                                        <code>previewClass</code>{string} [可选] <span class="mr-5">[默认: ""]</span>
+                                        需要添加在预览框上的class类名，
+                                    </li>
+                                    <li>
+                                        <code>previewElement</code>{string} [可选] <span class="mr-5">[默认: div]</span>
+                                        预览框的元素类型
+                                    </li>
+                                    <li>
+                                        <code>showToolBtn</code>{Boolean} [可选] <span class="mr-5">[默认: true]</span>
+                                        是否在预览框中显示工具按钮，默认为true。工具按钮包括左旋转、右旋转、删除，如果选择的文件不是图片则只有删除按钮。如果设置为true，则当鼠标经过预览框时工具按钮会显示，离开时自动隐藏
+                                    </li>
+                                    <li>
+                                        <code>onlyDel</code>{Boolean} [可选] <span class="mr-5">[默认: false]</span>
+                                        工具按钮中是否只生成"删除"按钮
+                                    </li>
+                                    <li>
+                                        <code>previewWrap</code>{Selector、dom、jQuery Object} [必填] <span class="mr-5">[默认: null]</span>
+                                        包裹预览框的父级元素，该参数为必填项，如果不填写则生成的预览框显示不了
+                                    </li>
+                                    <li>
+                                        <code>errorMsg</code>{string} [可选] <span class="mr-5">[默认: "上传失败,"]</span>
+                                        上传请求失败时的提示信息，如下图白色圈起的部分
+                                        <br />
+                                        <img src="images/1.png" alt="" />
+                                    </li>
+                                    <li>
+                                        <code>delBtn</code>{string} [可选] <span class="mr-5">[默认: "删除"]</span>
+                                        工具按钮中"删除"按钮的文字，若值为-1则不会创建该按钮，如下图白色部分
+                                        <br />
+                                        <img src="images/2.png" alt="" />
+                                    </li>
+                                    <li>
+                                        <code>retryBtn</code>{string} [可选] <span class="mr-5">[默认: "重试"]</span>
+                                         工具按钮中"重试"按钮的文字，若值为-1则不会创建该按钮，如下图白色部分
+                                         <br />
+                                        <img src="images/3.png" alt="" />
+                                    </li>
+                                    <li>
+                                        <code>changeUploadBtnText</code>{Boolean} [可选] <span class="mr-5">[默认: true]</span>
+                                        在上传过程中是否改变"开始上传"按钮的文字，如果按钮文字从"开始上传"变成了"暂停上传"，再次点击按钮就会暂停上传。如果文字从"暂停上传"变成了"继续上传"，再次点击按钮就会继续上传
+                                    </li>
+                                    <li>
+                                        <code>pauseText</code>{string} [可选] <span class="mr-5">[默认: "暂停上传"]</span>
+                                        该参数必须在<code>changeUploadBtnText</code>参数为<code>true</code>时才会有效。当"开始上传"按钮文字从"开始上传"变为"暂停上传"时，"暂停上传"文字就是使用 <code>pauseText</code>
+                                    </li>
+                                    <li>
+                                        <code>continueText</code>{string} [可选] <span class="mr-5">[默认: "暂停上传"]</span>
+                                        该参数必须在<code>changeUploadBtnText</code>参数为<code>true</code>时才会有效。当"开始上传"按钮文字从"暂停上传"变为"继续上传"时，"继续上传"文字就是使用 <code>continueText</code>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <code>btns</code>按钮相关设置
+                                <ul>
+                                    <li>
+                                        <code>chooseBtn</code>{Selector、dom、jQuery Object} [必填] <span class="mr-5">[默认: null]</span>
+                                        选择文件的按钮
+                                    </li>
+                                    <li>
+                                        <code>chooseBtnText</code>{string} [可选] <span class="mr-5">[默认: "选择图片"]</span>
+                                        选择文件按钮的文字
+                                    </li>
+                                    <li>
+                                        <code>uploadBtn</code>{Selector、dom、jQuery Object} [可选] <span class="mr-5">[默认: null]</span>
+                                        上传文件的按钮
+                                    </li>
+                                    <li>
+                                        <code>retryBtn</code>{Selector、dom、jQuery Object} [可选] <span class="mr-5">[默认: null]</span>
+                                        重新上传的按钮
+                                    </li>
+                                    <li>
+                                        <code>chooseBtnCanUseOnFinish</code>{Boolean} [可选] <span class="mr-5">[默认: true]</span>
+                                        当所有文件上传结束后"选择文件"按钮是否可用 
+                                        <a href="demo/chooseBtn&uploadBtnCanUseOnFinish.html" target="_blank">查看demo</a>
+                                    </li>
+                                    <li>
+                                        <code>uploadBtnCanUsOnFinish</code>{Boolean} [可选] <span class="mr-5">[默认: true]</span>
+                                        当所有文件上传结束后"开始上传"按钮是否可用 
+                                        <a href="demo/chooseBtn&uploadBtnCanUseOnFinish.html" target="_blank">查看demo</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <code>ignore</code>指定排除哪些类型的文件 <a href="demo/ignore.html" target="_blank">查看demo</a>
+                                <ul>
+                                    <li>
+                                        <code>extensions</code>{string} [可选] <span class="mr-5">[默认: ""]
+                                        排除指定后缀名的文件，多个后缀名按<code>,</code>隔开。如：<code>js,html,css</code>、<code>.php,.class,.cs</code>
+                                    </li>
+                                    <li>
+                                        <code>mimeTypes</code>{string} [可选] <span class="mr-5">[默认: ""]
+                                        排除指定MIME类型的文件，多个MIME类型名按<code>,</code>隔开。如：<code>application/A2L,application/pdf</code>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <code>sendAsBlob</code>{Boolean} [可选] <span class="mr-5">[默认: false]
+                                是否以二进制流的形式发送
+                            </li>
+                            <li>
+                                <code>compress</code>{Boolean} [可选] <span class="mr-5">[默认: false]
+                                图片在上传前是否进行压缩，默认不进行压缩
+                            </li>
+                            <li>
+                                <code>duplicate</code>{Boolean} [可选] <span class="mr-5">[默认: false]
+                                单个文件是否可以重复多次上传，即一个文件上传成功后是否可以再次上传
+                            </li>
+                            <li>
+                                <code>maxFileNum</code>{int} [可选] <span class="mr-5">[默认: 50]
+                                最大上传文件个数
+                            </li>
+                            <li>
+                                <code>maxFileSize</code>{int} [可选] <span class="mr-5">[默认: 5242880(B)]
+                                单个文件体积最大大小，默认5242880 Bite，即5M
+                            </li>
+                            <li>
+                                <code>maxFileTotalSize</code>{int} [可选] <span class="mr-5">[默认: 524288000(B)]
+                                所有文件体积最大大小，默认524288000 Bite，即500M
+                            </li>
+                        </ul>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_event">事件说明</h3>
+                        <table>
+                            <tr>
+                                <th class="w-percent-15">事件名</th>
+                                <th class="w-percent-45">参数说明</th>
+                                <th class="w-percent-45">描述</th>
+                            </tr>
+                            <tr>
+                                <td class="w-percent-15">
+                                    <code>fileQueued</code>
+                                </td>
+                                <td class="w-percent-45">
+                                    <ul>
+                                        <li><code>file</code> {WUFile} WUFile对象</li>
+                                        <li>
+                                            <code>img</code> {dom} dom对象 该参数只有在选择的文件为图片的时候才会存在
+                                        </li>
+                                        <li><code>src</code> {string} base 64字符串 该参数只有在选择的文件为图片的时候才会存在</li>
+                                    </ul>
+                                </td>
+                                <td class="w-percent-45">
+                                    当文件被加入队列以后触发。即当选择了文件后会执行该函数
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-percent-15">
+                                    <code>fileDeQueued</code>
+                                </td>
+                                <td class="w-percent-45">
+                                    <ul>
+                                        <li><code>file</code> {WUFile} WUFile对象</li>
+                                    </ul>
+                                </td>
+                                <td class="w-percent-45">
+                                    当文件被移出队列以后触发。可以理解为删除文件时触发
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-percent-15">
+                                    <code>uploadStart</code>
+                                </td>
+                                <td class="w-percent-45"></td>
+                                <td class="w-percent-45">
+                                    文件开始上传时触发的函数（多个文件只会执行一次）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-percent-15">
+                                    <code>uploadComplete</code>
+                                </td>
+                                <td class="w-percent-45">
+                                    <ul>
+                                        <li><code>file</code> {WUFile} WUFile对象</li>
+                                    </ul>
+                                </td>
+                                <td class="w-percent-45">
+                                    当文件单个上传完成后触发（不管成功或失败）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-percent-15">
+                                    <code>uploadSuccess</code>
+                                </td>
+                                <td class="w-percent-45">
+                                    <ul>
+                                        <li><code>file</code> {WUFile} WUFile对象</li>
+                                        <li><code>response</code>该参数为后端返回的数据</li>
+                                    </ul>
+                                </td>
+                                <td class="w-percent-45">
+                                    当上传成功（此处的上传成功指的是上传图片请求成功，并非图片真正上传到服务器）后所执行的函数
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-percent-15">
+                                    <code>uploadError</code>
+                                </td>
+                                <td class="w-percent-45">
+                                    <ul>
+                                        <li><code>file</code> {WUFile} WUFile对象</li>
+                                        <li><code>reason</code> {string} 上传错误原因</li>
+                                    </ul>
+                                </td>
+                                <td class="w-percent-45">
+                                    当单个文件上传出错时触发
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-percent-15">
+                                    <code>uploadFinish</code>
+                                </td>
+                                <td class="w-percent-45"></td>
+                                <td class="w-percent-45">
+                                    所有文件上传都结束时触发的函数（多个文件只会执行一次）
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-percent-15">
+                                    <code>error</code>
+                                </td>
+                                <td class="w-percent-45">
+                                    <ul>
+                                        <li><code>errorInfo</code> {Object} 一个包含错误信息的对象</li>
+                                        <li><code>file</code> {WUFile} WUFile对象</li>
+                                    </ul>
+                                </td>
+                                <td class="w-percent-45">
+                                    当validate不通过时（如文件数量超出、文件大小超出、类型不匹配等等），会以派送错误事件的形式通知调用者。
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-percent-15">
+                                    <code>onDel</code>
+                                </td>
+                                <td class="w-percent-45">
+                                    
+                                </td>
+                                <td class="w-percent-45">
+                                    当点击预览框中的"删除"按钮时所触发的函数，如果此函数返回false，则点击"删除"不会删除预览框及文件
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div id="anchor_method">
+                        <h3 id="anchor_upload">upload</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.upload() => 当前UploadPreview对象</li>
+                        </ul>
+                        <p>上传文件</p>
+                        <pre>
+                            <code class="javascript">
+        var uploadPreview = new UploadPreview({...});
+
+        $("#uploadBtn").on("click", function (){
+            uploadPreview.upload();
+        });
+                            </code>
+                        </pre>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_stop">stop</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.stop() => 当前UploadPreview对象</li>
+                        </ul>
+                        <p>暂停上传，调用<code>stop()</code>后还在上传队列中等待上传的文件将不会继续上传，已经发送的请求不会停止</p>
+                        <pre>
+                            <code class="javascript">
+        var uploadPreview = new UploadPreview({...});
+
+        $("#pauseBtn").on("click", function (){
+            uploadPreview.stop();
+        });
+                            </code>
+                        </pre>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_retry">retry</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.retry() => 当前UploadPreview对象</li>
+                            <li>uploadPreview.retry( file ) => 当前UploadPreview对象</li>
+                        </ul>
+                        <p>参数：</p>
+                        <ul>
+                            <li>
+                                <code>file</code>{WUFile} [可选]
+                            </li>
+                        </ul>
+                        <p>重新上传，当文件上传出错后调用<code>retry()</code>方法可以重新上传之前上传出错或失败的文件。不传参数默认重新上传所有上传出错或
+                        失败的文件，如果传递了参数并且参数是一个WUFile对象则重新上传指定的文件</p>
+                        <pre>
+                            <code class="javascript">
+        var uploadPreview = new UploadPreview({...});
+
+        $("#retryBtn").on("click", function (){
+            uploadPreview.retry();
+        });
+                            </code>
+                        </pre>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_destroy">destroy</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.destroy() => undefined</li>
+                        </ul>
+                        <p>销毁webuploader实例</p>
+                        <div class="mb-30"></div>
+
+                        <h3 id="anchor_delete">delete</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.delete(WUFileOrId) => 当前UploadPreview对象</li>
+                        </ul>
+
+                        <p>删除指定文件。WUFileOrId可以是一个WUFile(文件)对象，也可以文件的id，id的值一般为：<code>WU_FILE_x</code>，<code>x</code>为数字。
+                        调用delete()方法后会自动调用传递的<code>fileDequeued</code>参数</p>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_refresh">refresh</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.refresh() => 当前UploadPreview对象</li>
+                            <li>uploadPreview.refresh(btn) => 当前UploadPreview对象</li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <code>btn</code> {dom、jQuery Object} [可选]
+                            </li>
+                        </ul>
+                        <p>重新渲染"选择文件"按钮。有时候我们的业务场景可能是在模态窗中选择文件，而模态窗默认是<code>display: none</code>的，在这种情况下
+                        如果在模态窗显示前初始化了<code>webuploader(即new UploadPreview(...))</code>，则可能会出现"选择文件"按钮用不了的情况。如果是这种情况
+                        那么可以调用<code>refresh()</code>对按钮再次进行渲染 <a href="demo/refresh.html" target="_blank">查看demo</a>
+                        </p>
+                        <pre>
+                            <code class="javascript">
+        var uploadPreview = new UploadPreview({...});
+
+        $("#refresh").on("click", function (){
+            uploadPreview.refresh();
+            //uploadPreview.refresh(document.getElementById("chooseBtn"));
+        });
+                            </code>
+                        </pre>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_disable">disable</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.disable() => 当前UploadPreview对象</li>
+                        </ul>
+                        <p>禁用"选择文件"按钮。禁用按钮后会给"选择文件"按钮添加<code>.webuploader-pick-disable</code>class 类</p>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_enable">enable</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.enable() => 当前UploadPreview对象</li>
+                        </ul>
+                        <p>启用"选择文件"按钮</p>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_setData">setData</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.enable() => 当前UploadPreview对象</li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <code>WUFile</code> {WUFile} [必填] 该参数可以为WUFile对象或WUFile对象的id，传递这个参数后就可以给该文件设置额外参数
+                            </li>
+                            <li>
+                                <code>data</code> {Object} [必填]  该参数为需要添加到文件中的额外参数，该参数必须为一个对象，并且不能是伪数组、数组或window
+                            </li>
+                        </ul>
+                        <p>给指定文件单独的设置需要上传到服务器端的额外参数。有时候我们在开发类似用户资料填写的功能的时候，需要先提交用户填写的文字信息，提交
+                        完成后服务器端返回一个id，然后再上传图片的时候将这个id也传递给后端。<code>setData()</code>方法就是为了解决这一需求的。
+                        <a href="demo/setData.html" target="_blank">查看demo</a>
+                        </p>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_getFile">getFiles</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.getFiles() => 包含所有已选择的文件的对象，对象的键为<code>WUFile</code>的id，值为选择的文件(WUFile)</li>
+                        </ul>
+                        <p>获取用户选择的所有文件</p>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_getStats">getStats</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.getStats() => 包含以下信息的对象</li>
+                            <ul>
+                                <li><code>successNum</code>上传成功的文件数</li>
+                                <li><code>progressNum</code>上传中的文件数</li>
+                                <li><code>cancelNum</code>被删除的文件数</li>
+                                <li><code>invalidNum</code>无效的文件数</li>
+                                <li><code>uploadFailNum</code>上传失败的文件数</li>
+                                <li><code>queueNum</code>还在队列中的文件数</li>
+                                <li><code>interruptNum</code>被暂停的文件数</li>
+                            </ul>
+                        </ul>
+                        <p>获取文件统计信息</p>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_getFileLength">getFileLength</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.getFileLength() => 当前用户选择的文件数量</li>
+                        </ul>
+                        <p>
+                            获取选择的文件数量
+                        </p>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_calculateWj">calculateWh</h3>        
+                        <ul class="signature">
+                            <li>UploadPreview.calculateWh() => 返回一个包含width、height的对象</li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <code>viewW</code> {int} [必填|可选] 预览的宽度。如果不知道预览的宽度直接赋值-1.如果<code>viewW</code>为-1，则<code>viewH</code>必须大于-1
+                            </li>
+                            <li>
+                                <code>viewH</code> {int} [必填|可选] 预览的宽度。如果不知道预览的高度直接赋值-1.如果<code>viewH</code>为-1，则<code>viewW</code>必须大于-1
+                            </li>
+                            <li>
+                                <code>imgW</code>{int} [必填] 图片或真实的宽度。
+                            </li>
+                            <li>
+                                <code>imgH</code>{int} [必填] 图片或真实的高度。
+                            </li>
+                        </ul>
+                        <p>
+                            等比例计算宽高
+                        </p>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_setProgressWidth">setProgressWidth</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.setProgressWidth(ele,width) => 返回传递的ele</li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <code>ele</code> {Selector、jQuery Object} [必填] 预览框
+                            </li>
+                            <li>
+                                <code>width</code> {int} [必填] 进度条的长度
+                            </li>
+                        </ul>
+                        <p>
+                            设置预览框中进度条的长度
+                        </p>
+                    </div>
+
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <script src="jquery/jquery-1.12.4.min.js"></script>
+    <!-- 非必须 start -->
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/menu.js"></script>
+    <!-- 非必须 end -->
+    <script src="../webuploader.js"></script>
+    <script src="../UploadPreview.js"></script>
+    
+    <script>
+        new UploadPreview({
+            swf: "Uploader.swf",
+            url: "upload.php",
+            previewInfo: {
+                previewWrap: ".file-list"
+            },
+            btns: {
+                chooseBtn: document.getElementById("UploadPreview_chooseBtn"),
+                chooseBtnText: "拜托试一下嘛~",
+            }
+       });
+    </script>
+</body>
+</html>

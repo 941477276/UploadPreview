@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+     <link rel="stylesheet" href="../../css/webuploader.css" />
+     <style>
+        html,body{
+            width: 100%;
+            height: 100%;
+        }
+        body{
+            margin: 0;
+            padding: 0;
+        }
+        h3{
+            text-align: center;
+        }
+        .table-layout{
+            display: table;
+            table-layout: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        .table-col{
+            display: table-cell;
+            width: 50%;
+            padding: 40px;
+        }
+        .left{
+            border-right: 1px dashed #666;
+        }
+        .right{
+        }
+        .preview-list{
+            min-height: 180px;
+            padding: 20px;
+            border: 1px dashed #bbb;
+            margin-bottom: 20px;
+        }
+        .choose-file{
+            width: 160px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+        .choose-file .webuploader-pick{
+            line-height: 60px;
+        }
+     </style>
+</head>
+<body>
+    <div class="container table-layout">
+        <div class="left table-col">
+            <h3>当所有文件上传结束后"选择文件"、"开始上传"按钮可用</h3>
+            <div class="preview-list" id="preview_list1"></div>
+            <div class="choose-file" id="choose_file1"></div>
+            <button class="upload-btn" id="upload_btn1">开始上传</button>
+        </div>
+        <div class="right table-col">
+             <h3>当所有文件上传结束后"选择文件"、"开始上传"按钮不可用</h3>
+            <div class="preview-list" id="preview_list2"></div>
+            <div class="choose-file" id="choose_file2"></div>
+            <button class="upload-btn" id="upload_btn2">开始上传</button>
+        </div>
+    </div>
+   
+    
+
+
+    <script src="../../jquery-1.11.3.min.js"></script>
+    <script src="../../webuploader.js"></script>
+    <script src="../../UploadPreview.js"></script>
+    <input type="hidden" id="uloader_swf" value="../../Uploader.swf" />
+    <script>
+        new UploadPreview({
+            url: "upload.php",
+            swf: document.getElementById("uloader_swf"),
+            previewInfo: {
+                previewWrap: "#preview_list1"
+            },
+            btns: {
+                chooseBtn: "#choose_file1",
+                chooseBtnText: "选择文件",
+                uploadBtn: document.getElementById("upload_btn1")
+            },
+            uploadError: function (file,reason){
+                console.log('上传失败代码：' + reason);
+            },
+            uploadSuccess: function (file,response){
+                consoel.log(response);
+            }
+        });
+
+
+         new UploadPreview({
+            url: "upload.php",
+            swf: document.getElementById("uloader_swf"),
+            previewInfo: {
+                previewWrap: "#preview_list2"
+            },
+            btns: {
+                chooseBtn: "#choose_file2",
+                chooseBtnText: "选择文件",
+                uploadBtn: document.getElementById("upload_btn2"),
+                chooseBtnCanUseOnFinish: false,
+                uploadBtnCanUsOnFinish: false
+            },
+            uploadError: function (file,reason){
+                console.log('上传失败代码：' + reason);
+            },
+            uploadSuccess: function (file,response){
+                consoel.log(response);
+            }
+        });
+    </script>
+</body>
+</html>
