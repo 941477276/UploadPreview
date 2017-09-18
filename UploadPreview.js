@@ -2,7 +2,7 @@
 * @Author: 李燕南 9411477276@qq.com
 * @Date:   2017-08-15 16:59:16
 * @Last Modified by:   李燕南
-* @Last Modified time: 2017-08-28 17:01:08
+* @Last Modified time: 2017-09-18 14:42:44
 * @git: https://github.com/941477276/UploadPreview.git
 */
 ;
@@ -604,8 +604,8 @@
         return this;
     }
     /*获取选择的文件数量*/
-    UploadPreview.prototype.getFileLength = function (){
-        return this.uploader.getFiles().length;
+    UploadPreview.prototype.getFileLength = function (status){
+        return this.uploader.getFiles(status || "queued").length;
     }
     /*修改允许上传的文件总数量*/
     /*UploadPreview.prototype.updateMaxFileNum = function (newNum){
@@ -684,7 +684,7 @@
     /*删除指定文件
         @param WuFile: WuFile可以为一个file对象，也可以为file对象的id
     */
-    UploadPreview.prototype.delete = function (WuFile){
+    UploadPreview.prototype["delete"] = function (WuFile){
         if(!WuFile){return;}
         this.uploader.removeFile(WuFile);
         return this;
@@ -795,7 +795,7 @@
                 if($this.hasClass('cancel')){//删除按钮
                     var id = $this.data("id");
                     if(that.options.onDel && $.isFunction(that.options.onDel)){
-                        var flag = that.options.onDel();
+                        var flag = that.options.onDel(id);
                         if(flag === false){return;}
                     }
                     that.uploader.removeFile(id);//删除图片
