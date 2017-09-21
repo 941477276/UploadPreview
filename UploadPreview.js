@@ -2,7 +2,7 @@
 * @Author: 李燕南 9411477276@qq.com
 * @Date:   2017-08-15 16:59:16
 * @Last Modified by:   李燕南
-* @Last Modified time: 2017-09-18 14:42:44
+* @Last Modified time: 2017-09-21 19:56:37
 * @git: https://github.com/941477276/UploadPreview.git
 */
 ;
@@ -263,7 +263,7 @@
                     height = that.options.previewInfo.height;
                 
                 if((width == -1 || width == 0) && (height == -1 || height == 0)){
-                    width = previewBox.width();
+                    width = imgWrap.width();
                 }
                 that.createPreviewImg(WuFile, width, height, function (file, img, src){
                     imgWrap.find(".previewing").remove();
