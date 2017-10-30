@@ -2,7 +2,7 @@
 * @Author: 李燕南 9411477276@qq.com
 * @Date:   2017-08-15 16:59:16
 * @Last Modified by:   李燕南
-* @Last Modified time: 2017-09-21 19:56:37
+* @Last Modified time: 2017-10-30 15:38:01
 * @git: https://github.com/941477276/UploadPreview.git
 */
 ;
@@ -110,6 +110,7 @@
             accept = null;
         }
         this.options.accept = accept;
+        this.fileLen = 0;
         this.retryBtn = this.options.btns.retryBtn ? $(this.options.btns.retryBtn) : null;
 
         // 实例化uploader
@@ -238,6 +239,7 @@
 
             if(!(WuFile.id in that.files)){
                 that.files[WuFile.id] = WuFile;
+                that.fileLen ++;
             }
             if(!that.chooseBtnInput){
                 that.chooseBtnInput = $(that.options.btns.chooseBtn).find("input");
@@ -297,6 +299,7 @@
             
             if(WuFile.id in that.files){
                 delete that.files[WuFile.id];
+                that.fileLen--;
             }
             that._uploadPercentage("delete", WuFile.id);//修改进度信息
             that.options.fileDequeued.apply(this, arguments);
