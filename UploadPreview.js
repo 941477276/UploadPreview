@@ -2,7 +2,7 @@
 * @Author: 李燕南 9411477276@qq.com
 * @Date:   2017-08-15 16:59:16
 * @Last Modified by:   李燕南
-* @Last Modified time: 2017-11-08 10:11:00
+* @Last Modified time: 2017-11-08 10:12:06
 * @git: https://github.com/941477276/UploadPreview.git
 */
 ;
@@ -862,8 +862,6 @@
     }
 
     /*生成缩略图
-
-    
         @param file: file对象，即用户选择的文件
         @param fn: 调用makeThumb后的回调
         @param imgLoadFn: 如果调用makeThumb后可以生成预览图，则会自动生成一个img，并且会为这个
