@@ -2,7 +2,7 @@
 * @Author: 李燕南
 * @Date:   2017-08-18 17:35:39
 * @Last Modified by:   李燕南
-* @Last Modified time: 2017-08-28 10:50:10
+* @Last Modified time: 2017-12-04 11:25:42
 */
 
 body{
@@ -19,8 +19,15 @@ code{
 ul ul,ul ol,ol ul{
     list-style-type: circle;
 }
+li{
+    line-height: 1.6;
+    margin: 6px 0;
+}
 .mr-5{
     margin-right: 5px;
+}
+.badge{
+    background-color: #f00;
 }
 
 .container{
