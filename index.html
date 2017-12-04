@@ -8,7 +8,7 @@
         <script src="jquery-1.11.3.min.js"></script>
         
          <script src="webuploader.js"></script>
-       <script src="uploadPreview.js"></script>
+       <script src="UploadPreview.js"></script>
         <style>
             ._filelist .preview-box{/*这个选择器一定要有宽高，否则图片显示不出来，因为它里面的内容是绝对定位的*/
                 width: 280px;
@@ -20,15 +20,28 @@
                 background-color: #f60;
                 overflow: hidden;
             }
+            .drop-area{
+              height: 200px;
+              line-height: 200px;
+              border: 2px dashed #f60;
+              text-align: center;
+              font-size: 18px;
+              color: #666;
+            }
+
         </style>
     </head>
     <body>
+      
         <!-- .webuploader-pick 这个类可以控制选择文件可点按钮的大小 -->
         <h1>即可以选择图片又可以选择其他文件</h1>
+        <!-- <div class="drop-area">
+          <span>请将图片拖拽到这里。。。</span>
+        </div> -->
         <div id="uploader"></div>
         <!-- 千万不要使用button标签，否则在火狐和IE中点击会无效
         <button type="button" id="choose_file">选择图片</button> -->
-        <div id="choose_file_wraper"  style="display: none;">
+        <div id="choose_file_wraper" style="display: none;">
             <div class="choose-file-btn" id="choose_file">选择图片</div>    
         </div>
         
@@ -39,8 +52,6 @@
         <button type="button" id="upload_now">上传图片</button>
         <button type="button" id="getFiles">查看获取到的文件</button>
         <button type="button" id="addData">添加数据</button>
-        <button type="button" id="update_size">修改上传数量为5</button>
-        <button type="button" id="update_size2">修改上传数量为8</button>
 
 <br />
 <div></div>
@@ -76,10 +87,12 @@
        <script>
           var uploader = new UploadPreview({
                 swf: "Uploader.swf",
-                url: "sea.js",
+                url: "README.md",
                 previewInfo: {//预览参数配置
                     width: -1, //预览图片的宽度
                     height: -1, //预览图片的高度
+                    //errorTipShow: false,
+                    toolBtnShowOnUpload: true,
                     viewImgHorizontal: true,//预览图是否水平垂直居中
                     previewClass: "new-preview",//每个预览框的class
                     previewElement: "div",//每个预览框的元素，只能为字符串
@@ -87,6 +100,11 @@
                     onlyDel: false,//是否只生成"删除"按钮
                     previewWrap: ".file-list"//包裹所有预览图片的父级元素
                 },
+                /*drag: {//拖拽上传配置
+                  dnd: ".drop-area",// 指定Drag And Drop拖拽的容器，如果不指定，则不启动
+                  disableGlobalDnd: true,// 是否禁掉整个页面的拖拽功能，如果不禁用，图片拖进来的时候会默认被浏览器打开。
+                  paste: "body"// 指定监听paste事件的容器，如果不指定，不启用此功能。此功能为通过粘贴来添加截屏的图片。建议设置为document.body.
+              },*/
                // maxFileSize: (1024 * 1024),
                 maxFileNum: 5,
                // maxFileTotalSize: 1024*1024*5,
@@ -101,6 +119,7 @@
                 error: function (errorCode){
                     console.log(errorCode);
                 },
+                maxFileSize: 8388608,
                 pictureOnly: false,
                 ignore: {
                     extensions: ".txt,doc"
@@ -117,8 +136,11 @@
                 uploadError: function (WuFile,reason){
                   console.log(reason);
                 },
-                uploadStart: function (){
+                uploadStart: function (WuFile){
                   console.log(WuFile);
+                },
+                onDelUploaded: function (){
+                  return false; 
                 }
            });
 
@@ -130,9 +152,6 @@
           console.log(uploader);
           console.log(WebUploader);
 
-          setTimeout(function (){
-                
-          },5000)
           
 
           //console.log(uploader.uploader);
@@ -161,15 +180,6 @@
                     "hello": "我是新添加进来的数据！"
                 });
           });
-          $("#update_size").on("click", function (){
-                uploader.updateMaxFileNum(5);
-          });
-          $("#update_size2").on("click", function (){
-                uploader.updateMaxFileNum(8);
-          });
-
-
-
 
 
 

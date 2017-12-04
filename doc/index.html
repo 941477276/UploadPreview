@@ -212,12 +212,22 @@
                                         是否在预览框中显示工具按钮，默认为true。工具按钮包括左旋转、右旋转、删除，如果选择的文件不是图片则只有删除按钮。如果设置为true，则当鼠标经过预览框时工具按钮会显示，离开时自动隐藏
                                     </li>
                                     <li>
+                                        <span class="badge">new</span>
+                                        <code>toolBtnShowOnUpload</code>{Boolean} [可选] <span class="mr-5">[默认: false]</span>
+                                        工具按钮在图片上传成功后（请求成功，并不代表图片真正已经存储到服务器了）是否显示，默认为false。如果图片上传完成后，你要实现点击"删除"按钮发送一条删除图片的ajax请求，然后删除图片的效果，那么可以设置这个参数为true
+                                    </li>
+                                    <li>
                                         <code>onlyDel</code>{Boolean} [可选] <span class="mr-5">[默认: false]</span>
                                         工具按钮中是否只生成"删除"按钮
                                     </li>
                                     <li>
                                         <code>previewWrap</code>{Selector、dom、jQuery Object} [必填] <span class="mr-5">[默认: null]</span>
                                         包裹预览框的父级元素，该参数为必填项，如果不填写则生成的预览框显示不了
+                                    </li>
+                                    <li>
+                                        <span class="badge">new</span>
+                                        <code>errorTipShow</code>{boolean} [可选] <span class="mr-5">[默认: true]</span>
+                                        图片上传失败后是否显示上传失败的提示，默认为显示
                                     </li>
                                     <li>
                                         <code>errorMsg</code>{string} [可选] <span class="mr-5">[默认: "上传失败,"]</span>
@@ -248,6 +258,24 @@
                                     <li>
                                         <code>continueText</code>{string} [可选] <span class="mr-5">[默认: "暂停上传"]</span>
                                         该参数必须在<code>changeUploadBtnText</code>参数为<code>true</code>时才会有效。当"开始上传"按钮文字从"暂停上传"变为"继续上传"时，"继续上传"文字就是使用 <code>continueText</code>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <span class="badge">new</span>
+                                <code>drag</code>拖拽上传相关配置
+                                <ul>
+                                    <li>
+                                        <code>dnd</code>{Selector、dom、jQuery Object} [必填] <span class="mr-5">[默认: null]</span>
+                                        如果不传递则不会启动拖拽上传功能
+                                    </li>
+                                    <li>
+                                        <code>disableGlobalDnd</code>{boolean} [可选] <span class="mr-5">[默认: false]</span>
+                                        是否禁掉整个页面的拖拽功能，如果不禁用，图片拖进来的时候会默认被浏览器打开。
+                                    </li>
+                                    <li>
+                                        <code>paste</code>{Selector、dom、jQuery Object} [可选] <span class="mr-5">[默认: null]</span>
+                                        指定监听paste事件的容器，如果不指定，不启用此功能。此功能为通过粘贴来添加截屏的图片。建议设置为document.body.
                                     </li>
                                 </ul>
                             </li>
@@ -438,10 +466,26 @@
                                     <code>onDel</code>
                                 </td>
                                 <td class="w-percent-45">
-                                    
+                                    <ul>
+                                        <li><code>id</code> {string} 当前预览框的id</li>
+                                    </ul>
                                 </td>
                                 <td class="w-percent-45">
                                     当点击预览框中的"删除"按钮时所触发的函数，如果此函数返回false，则点击"删除"不会删除预览框及文件
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-percent-15">
+                                    <span class="badge">new</span><code>onDelUploaded</code>
+                                </td>
+                                <td class="w-percent-45">
+                                    <ul>
+                                        <li><code>id</code> {string} 当前预览框的id</li>
+                                    </ul>
+                                </td>
+                                <td class="w-percent-45">
+                                    当点击预览框中的"删除"按钮时所触发的函数，如果此函数返回false，则点击"删除"不会删除预览框及文件。
+                                    <strong>该函数必须在文件上传成功后才会触发</strong>
                                 </td>
                             </tr>
                         </table>

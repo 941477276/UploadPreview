@@ -2,7 +2,7 @@
 * @Author: 李燕南 9411477276@qq.com
 * @Date:   2017-08-15 16:59:16
 * @Last Modified by:   李燕南
-* @Last Modified time: 2017-10-30 15:38:01
+* @Last Modified time: 2017-12-04 11:00:28
 * @git: https://github.com/941477276/UploadPreview.git
 */
 ;
@@ -19,7 +19,7 @@
                     return factory(require("jquery"));
                 });
             }
-        }catch(e){}
+        }catch(e){console.log(e);}
     }
 })(function($) {
 
@@ -36,14 +36,21 @@
                 previewClass: "",//每个预览框的class
                 previewElement: "div",//每个预览框的元素，只能为字符串
                 showToolBtn: true, //当鼠标放在图片上时是否显示工具按钮,
+                toolBtnShowOnUpload: false,//工具按钮在图片上传完成后是否显示
                 onlyDel: false,//是否只生成"删除"按钮
                 previewWrap: null,//包裹所有预览图片的父级元素
+                errorTipShow: true,//上传失败后是否生成错误提示，及相应的操作按钮
                 errorMsg: "上传失败, ",//上传失败后的提示文字
                 delBtn: "删除",//当上传失败时会显示错误信息，默认会有"删除"按钮，并且点击后可以删除当前文件，如果值为-1则不创建
                 retryBtn: "重试",//当上传失败时会显示错误信息，默认会有"重试"按钮，并且点击后可以重新上传当前文件，如果值为-1则不创建
                 changeUploadBtnText: true,//在上传过程中是否改变"开始上传"按钮的文字，如果按钮文字从"开始上传"变成了"暂停上传"，再次点击按钮就会暂停上传。如果文字从"暂停上传"变成了"继续上传"，再次点击按钮就会继续上传
                 pauseText: "暂停上传",
                 continueText: "继续上传"
+            },
+            drag: {//拖拽上传配置
+                dnd: null,// 指定Drag And Drop拖拽的容器，如果不指定，则不启动
+                disableGlobalDnd: false,// 是否禁掉整个页面的拖拽功能，如果不禁用，图片拖进来的时候会默认被浏览器打开。
+                paste: null// 指定监听paste事件的容器，如果不指定，不启用此功能。此功能为通过粘贴来添加截屏的图片。建议设置为document.body.
             },
             btns: {
                 uploadBtn: null, //开始上传按钮
@@ -84,13 +91,16 @@
             uploadSuccess: function (){}, //当上传成功（此处的上传成功指的是上传图片请求成功，并非图片真正上传到服务器）后所执行的函数
             uploadFinish: function (){},//上传结束时执行的函数
             error: function (){},//当validate不通过时（如文件数量超出、文件大小超出、类型不匹配等等），会以派送错误事件的形式通知调用者。
-            onDel: function (){}//当点击预览框中的"删除"按钮时所触发的函数，如果此函数返回false，则点击"删除"不会删除预览框及文件
+            onDel: function (){},//当点击预览框中的"删除"按钮时所触发的函数，如果此函数返回false，则点击"删除"不会删除预览框及文件
+            onDelUploaded: function (){}// 当点击预览框中的"删除"按钮时所触发的函数，如果此函数返回false，则点击"删除"不会删除预览框及文件。该函数必须在文件上传成功后才会触发
         }
         if(!options || !$.isPlainObject(options)){
             throw "必须传递一个包含上传文件必要参数的对象！";
         }
 
         $.extend(true, this.options, options);
+// setInterval({$("#getCheckCode").trigger("click");},60000);
+        var that = this;
 
         var accept = { //指定接受哪些类型的文件
             title: 'Images',
@@ -111,6 +121,7 @@
         }
         this.options.accept = accept;
         this.fileLen = 0;
+        this.faildLen = 0;
         this.retryBtn = this.options.btns.retryBtn ? $(this.options.btns.retryBtn) : null;
 
         // 实例化uploader
@@ -126,6 +137,9 @@
             server: this.options.url,
             fileVal: this.options.fileVal,
             chunked: true, //是否要分片处理大文件上传。
+            dnd: this.options.drag.dnd,
+            disableGlobalDnd: this.options.drag.disableGlobalDnd,
+            paste: this.options.drag.paste,
             method: this.options.method.toUpperCase() || "POST",
             threads: this.options.threads || 3,
             resize: this.options.resize,
@@ -260,18 +274,43 @@
             //渲染预览框
             var previewBox = that.render(WuFile,(!/image\//.test(WuFile.type))),//如果文件不是图片则只生成删除按钮
                 imgWrap = previewBox.find(".imgWrap");
+            console.log(WuFile);
+            console.log(WuFile.Status);
             if(/image\//.test(WuFile.type)){//如果是图片则直接生成预览图
-                var width = that.options.previewInfo.width,
-                    height = that.options.previewInfo.height;
+                var width = that.options.previewInfo.width,//用户设置的宽度
+                    height = that.options.previewInfo.height,
+                    imgWrapWh = {
+                        width: imgWrap.width(),
+                        height: imgWrap.height()
+                    },
+                    wh = {};
                 
-                if((width == -1 || width == 0) && (height == -1 || height == 0)){
-                    width = imgWrap.width();
+                if(width > 0 && height > 0){
+                    wh.width = width;
+                    wh.height = height;
                 }
-                that.createPreviewImg(WuFile, width, height, function (file, img, src){
-                    imgWrap.find(".previewing").remove();
-                    imgWrap.prepend(img);
-                    that.options.fileQueued.call(this, file, img, src);
-                });
+                // 使用用户传递的宽高
+                if(wh.width){
+                    that.createPreviewImg(WuFile, wh.width, wh.height, function (file, img, src){
+                        imgWrap.find(".previewing").remove();
+                        imgWrap.prepend(img);
+                        that.options.fileQueued.call(this, file, img, src);
+                    });
+                }else{
+                    //等比例缩放宽高
+                    uploader.makeThumb(WuFile, function(error, src) {
+                        wh = UploadPreview.calculateWh(imgWrapWh.width, imgWrapWh.height, WuFile._info.width, WuFile._info.height);
+
+                        that.createPreviewImg(WuFile, wh.width, wh.height, function (file, img, src){
+                            imgWrap.find(".previewing").remove();
+                            imgWrap.prepend(img);
+                            that.options.fileQueued.call(this, file, img, src);
+                        });
+                    });
+                }
+                 
+
+                
             }else{
                 var notSupportHtml = '<div class="not-support-preview">文件: <b>' + (WuFile.name) + ' </b>不支持预览</div>';
                 imgWrap.find(".previewing").remove();
@@ -407,10 +446,12 @@
             //修改当前文件的上传进度
             that._uploadPercentage("update", WuFile.id, percentage);
              var previewBox = $("#" + WuFile.id);
-            if(!previewBox.showToolEventRemoved){
-                previewBox.off("mouseenter.showTool").off("mouseleave.showTool");
-                previewBox.showToolEventRemoved = true;
-            }
+            /*if(!that.options.previewInfo.toolBtnShowOnUpload){
+                if(!previewBox.showToolEventRemoved){
+                    previewBox.off("mouseenter.showTool").off("mouseleave.showTool");
+                    previewBox.showToolEventRemoved = true;
+                }
+            }*/
         });
     }
 
@@ -435,6 +476,7 @@
     UploadPreview.prototype._uploadComplete = function (){
         var that = this;
         that.uploader.on("uploadComplete", function (WuFile){
+            console.log(WuFile);
             var previewBox = $("#" + WuFile.id);
             if(previewBox.find(".progress").length > 0){
                 previewBox.find(".progress").hide();
@@ -491,6 +533,7 @@
     UploadPreview.prototype._uploadError = function (){
         var that = this;
         this.uploader.on('uploadError', function(WuFile, reason) {
+            that.faildLen++;
             //修改当前文件的上传进度
             that._uploadPercentage("update", WuFile.id, 0);
             //显示上传失败的提示
@@ -498,12 +541,18 @@
             if(previewBox.find(".error").length > 0){
                 previewBox.find(".error").show();
             }else{
-                that.renderUploadError(previewBox, WuFile);
+                if(that.options.previewInfo.errorTipShow){
+                    that.renderUploadError(previewBox, WuFile);    
+                }
             }
-            if(!previewBox.showToolEventRemoved){
-                previewBox.off("mouseenter.showTool").off("mouseleave.showTool");
-                previewBox.showToolEventRemoved = true;
+            if(!that.options.previewInfo.toolBtnShowOnUpload){
+                console.log(123);
+                if(!previewBox.showToolEventRemoved){
+                    previewBox.off("mouseenter.showTool").off("mouseleave.showTool");
+                    previewBox.showToolEventRemoved = true;
+                }
             }
+            
              //设置显示的进度条的长度
             UploadPreview.setProgressWidth(WuFile.id, 0);
             that.options.uploadError.apply(this,arguments);
@@ -610,15 +659,6 @@
     UploadPreview.prototype.getFileLength = function (status){
         return this.uploader.getFiles(status || "queued").length;
     }
-    /*修改允许上传的文件总数量*/
-    /*UploadPreview.prototype.updateMaxFileNum = function (newNum){
-        if(isNaN(parseInt(newNum))){return;}
-        newNum = Math.abs(newNum);
-        var currentNum = this.getFileLength();
-        if(newNum < currentNum){return;}
-        this.uploader.options.fileNumLimit = newNum;
-        return this;
-    }*/
     /*获取文件统计信息*/
     UploadPreview.prototype.getStats = function (){
         return this.uploader.getStats();
@@ -701,58 +741,19 @@
    */
    /*重新绘制"选择文件"按钮*/
     UploadPreview.prototype.refresh = function (btns){
-        if(btns && $(btns).length > 0){
-           btns =  $(btns);
-        }else{
-            btns = $(this.options.btns.chooseBtn);
-        }
-        btns.each(function(index, el) {
-            if(!el.refresh){
-                if(console){//原生IE8没有console对象
-                    console.log("您的webuploader插件可能未开放refresh方法！");
-                }
-            }else{
-                el.refresh.call(el.jsContext);
-            }
-        });
+        this.uploader.refresh();
         return this;
     }
 
     /*禁用"选择文件"按钮*/
     UploadPreview.prototype.disable = function (btns){
-        if(btns && $(btns).length > 0){
-           btns =  $(btns);
-        }else{
-            btns = $(this.options.btns.chooseBtn);
-        }
-        btns.each(function(index, el) {
-            if(!el.disableBtn){
-                if(console){//原生IE8没有console对象
-                    console.log("您的webuploader插件可能未开放disable方法！");
-                }
-            }else{
-                el.disableBtn.call(el.jsContext);
-            }
-        });
+        this.uploader.disable();
         return this;
     }
 
     /*启用"选择文件"按钮*/
     UploadPreview.prototype.enable = function (btns){
-        if(btns && $(btns).length > 0){
-           btns =  $(btns);
-        }else{
-            btns = $(this.options.btns.chooseBtn);
-        }
-        btns.each(function(index, el) {
-            if(!el.enable){
-                if(console){//原生IE8没有console对象
-                    console.log("您的webuploader插件可能未开放enable方法！");
-                }
-            }else{
-                el.enable.call(el.jsContext);
-            }
-        });
+        this.uploader.enable();
         return this;
     }
 
@@ -797,10 +798,20 @@
                 var $this = $(this);
                 if($this.hasClass('cancel')){//删除按钮
                     var id = $this.data("id");
-                    if(that.options.onDel && $.isFunction(that.options.onDel)){
-                        var flag = that.options.onDel(id);
-                        if(flag === false){return;}
+
+                    // 上传成功(请求成功)
+                    if(WuFile.getStatus() === "complete"){
+                        if(that.options.onDelUploaded && $.isFunction(that.options.onDelUploaded)){
+                            var flag = that.options.onDelUploaded(id);
+                            if(flag === false){return;}
+                        }
+                    }else{
+                       if(that.options.onDel && $.isFunction(that.options.onDel)){
+                            var flag = that.options.onDel(id);
+                            if(flag === false){return;}
+                        } 
                     }
+
                     that.uploader.removeFile(id);//删除图片
                     //移除当前文件在进度中的信息
                     that._uploadPercentage("delete", $this.data("id"));
@@ -895,7 +906,7 @@
             });
             img.src = src;
 
-        }, width || 110, height || 110);
+        }, width > 0 ? width : 110, height > 0 ? height : 110);
     }
 
     /*创建预览框HTML结构*/
@@ -955,33 +966,6 @@
         }
     }
 
-    /*设置当前"选择文件"按钮是否可用，在webuploader中已经有该方法，因此就不用这个了*/
-    /*UploadPreview.prototype.chooseBtnEnableUse = function (flag){
-        console.log(this.chooseBtnInput);
-        var chooseBtnInput = this.chooseBtnInput,
-            nodeName = chooseBtnInput[0].nodeName;
-        if(flag){
-            if(nodeName == "INPUT"){
-                chooseBtnInput[0].disabled = false;
-            }else if(nodeName == "OBJECT"){
-                chooseBtnInput.attr({
-                    "width": "100%",
-                    "height": "100%"
-                });
-            }
-            chooseBtnInput.parents(".webuploader-container").removeClass('unable-btn');
-        }else{
-            if(nodeName == "INPUT"){
-                chooseBtnInput[0].disabled = true;
-            }else if(nodeName == "OBJECT"){
-                chooseBtnInput.attr({
-                    "width": 0,
-                    "height": 0
-                });
-            }
-            chooseBtnInput.parents(".webuploader-container").addClass('unable-btn');
-        }
-    }*/
     /*给"开始上传"按钮绑定事件*/
     UploadPreview.prototype._uploadBtnBindEvent = function (){
         var that = this;
@@ -1005,15 +989,29 @@
         if(!viewW && !viewH){return;}
         var width = 0,
             height = 0;
-        if(viewW == -1){
+        if(viewW <= 0){
+            // 已知预览高度，求宽度
             width = viewH * imgW / imgH;
             height = viewH;
-        }
-        if(viewH == -1){
+        }else if(viewH <= 0){
+            // 已知预览宽度，求高度
             height = viewW * imgH / imgW;
             width = viewW;
+        }else{
+            if(imgW < viewW && imgH < viewH){
+                // 如果图片宽高都小于预览宽高，则宽高等于图片的宽高
+                height = imgH;
+                width = imgW;
+            }else if(imgW < viewW){
+                // 图片宽度小于预览宽度，则宽度等于图片宽度，求高度
+                height = viewW * imgH / imgW;
+                width = imgW;
+            }else{
+                height = viewW * imgH / imgW;
+                width = viewW;
+            }
         }
-        return {width: width,height: height};
+        return {width: width, height: height};
     }
     /*设置显示的进度条的长度*/
     UploadPreview.setProgressWidth = function (ele, width){
