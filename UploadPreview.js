@@ -1,8 +1,8 @@
 /*!
 * @Author: 李燕南 9411477276@qq.com
 * @Date:   2017-08-15 16:59:16
-* @Last Modified by:   李燕南
-* @Last Modified time: 2017-12-04 11:00:28
+* @Last Modified by:   李燕南-941477276@QQ.com
+* @Last Modified time: 2017-12-15 17:23:47
 * @git: https://github.com/941477276/UploadPreview.git
 */
 ;
@@ -274,8 +274,6 @@
             //渲染预览框
             var previewBox = that.render(WuFile,(!/image\//.test(WuFile.type))),//如果文件不是图片则只生成删除按钮
                 imgWrap = previewBox.find(".imgWrap");
-            console.log(WuFile);
-            console.log(WuFile.Status);
             if(/image\//.test(WuFile.type)){//如果是图片则直接生成预览图
                 var width = that.options.previewInfo.width,//用户设置的宽度
                     height = that.options.previewInfo.height,
@@ -476,7 +474,6 @@
     UploadPreview.prototype._uploadComplete = function (){
         var that = this;
         that.uploader.on("uploadComplete", function (WuFile){
-            console.log(WuFile);
             var previewBox = $("#" + WuFile.id);
             if(previewBox.find(".progress").length > 0){
                 previewBox.find(".progress").hide();
@@ -546,7 +543,6 @@
                 }
             }
             if(!that.options.previewInfo.toolBtnShowOnUpload){
-                console.log(123);
                 if(!previewBox.showToolEventRemoved){
                     previewBox.off("mouseenter.showTool").off("mouseleave.showTool");
                     previewBox.showToolEventRemoved = true;
