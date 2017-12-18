@@ -2,7 +2,7 @@
 * @Author: 李燕南 9411477276@qq.com
 * @Date:   2017-08-15 16:59:16
 * @Last Modified by:   李燕南-941477276@QQ.com
-* @Last Modified time: 2017-12-15 17:23:47
+* @Last Modified time: 2017-12-18 16:15:11
 * @git: https://github.com/941477276/UploadPreview.git
 */
 ;
@@ -73,6 +73,8 @@
             swf: "Uploader.swf", //swf文件路径
             url: "upload.php", //图片上传的路径
             datas: null, //上传的参数
+            // ios是否只能摄像头拍照，而不能选择其他文件或图片。在webuploader0.1.7中会有这样的情况
+            iosOnlyCamera: false,  
             // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！false为不压缩
             resize: false,
             //是否可以重复上传，即上传一张图片后还可以再次上传。默认是不可以的，false为不可以，true为可以
@@ -115,8 +117,12 @@
                 mimeTypes = optionAccept.mimeTypes || "";
             accept.extensions = accept.extensions += "," + (extensions.replace(".",""));
             accept.mimeTypes = accept.mimeTypes += "," + mimeTypes;
+            // 解决webuploader0.1.7 在ios中只能使用摄像头拍照的bug
+            if(!this.options.iosOnlyCamera && WebUploader.Base.os.ios){
+                accept.mimeTypes += 'text/plain,application/msword,application/octet-stream,application/vnd.ms-excel,application/x-shockwave-flash,application/gzip';
+            }
         }
-        if(!this.options.pictureOnly){
+        if(!this.options.pictureOnly && !optionAccept){
             accept = null;
         }
         this.options.accept = accept;
@@ -174,6 +180,8 @@
         this._uploadAccept();
         //给uploader绑定 uploadError 事件
         this._uploadError();
+        
+        
 
         //判断浏览器是否支持transition属性
         this.supportTransition = (function() { 
@@ -200,6 +208,17 @@
 
         if(this.options.previewInfo.previewWrap){
             $(this.options.previewInfo.previewWrap).addClass('_filelist');
+        }
+         // 解决webuploader0.1.7 在ios中只能使用摄像头拍照的bug
+        if(!this.options.iosOnlyCamera && WebUploader.Base.os.ios){
+            var $btn = $(this.options.btns.chooseBtn),
+                $input = null;
+            setTimeout(function (){
+                $input = $btn.find("input");
+                if($input.attr("capture") == "camera"){
+                    $input.removeAttr("capture");
+                }
+            }, 1800);
         }
     }
     /*给uploader绑定 beforeFileQueued 事件*/
@@ -274,6 +293,8 @@
             //渲染预览框
             var previewBox = that.render(WuFile,(!/image\//.test(WuFile.type))),//如果文件不是图片则只生成删除按钮
                 imgWrap = previewBox.find(".imgWrap");
+            console.log(WuFile);
+            console.log(WuFile.Status);
             if(/image\//.test(WuFile.type)){//如果是图片则直接生成预览图
                 var width = that.options.previewInfo.width,//用户设置的宽度
                     height = that.options.previewInfo.height,
@@ -474,6 +495,7 @@
     UploadPreview.prototype._uploadComplete = function (){
         var that = this;
         that.uploader.on("uploadComplete", function (WuFile){
+            console.log(WuFile);
             var previewBox = $("#" + WuFile.id);
             if(previewBox.find(".progress").length > 0){
                 previewBox.find(".progress").hide();
@@ -543,6 +565,7 @@
                 }
             }
             if(!that.options.previewInfo.toolBtnShowOnUpload){
+                console.log(123);
                 if(!previewBox.showToolEventRemoved){
                     previewBox.off("mouseenter.showTool").off("mouseleave.showTool");
                     previewBox.showToolEventRemoved = true;
