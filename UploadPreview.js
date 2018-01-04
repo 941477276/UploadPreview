@@ -1,8 +1,8 @@
 /*!
 * @Author: 李燕南 9411477276@qq.com
 * @Date:   2017-08-15 16:59:16
-* @Last Modified by:   李燕南
-* @Last Modified time: 2017-12-04 11:00:28
+* @Last Modified by:   李燕南-941477276@QQ.com
+* @Last Modified time: 2017-12-20 20:06:58
 * @git: https://github.com/941477276/UploadPreview.git
 */
 ;
@@ -73,6 +73,8 @@
             swf: "Uploader.swf", //swf文件路径
             url: "upload.php", //图片上传的路径
             datas: null, //上传的参数
+            // ios是否只能摄像头拍照，而不能选择其他文件或图片。在webuploader0.1.7中会有这样的情况
+            iosOnlyCamera: false,  
             // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！false为不压缩
             resize: false,
             //是否可以重复上传，即上传一张图片后还可以再次上传。默认是不可以的，false为不可以，true为可以
@@ -115,8 +117,12 @@
                 mimeTypes = optionAccept.mimeTypes || "";
             accept.extensions = accept.extensions += "," + (extensions.replace(".",""));
             accept.mimeTypes = accept.mimeTypes += "," + mimeTypes;
+            // 解决webuploader0.1.7 在ios中只能使用摄像头拍照的bug
+            if(!this.options.iosOnlyCamera && WebUploader.Base.os.ios){
+                accept.mimeTypes += 'text/plain,application/msword,application/octet-stream,application/vnd.ms-excel,application/x-shockwave-flash,application/gzip';
+            }
         }
-        if(!this.options.pictureOnly){
+        if(!this.options.pictureOnly && !optionAccept){
             accept = null;
         }
         this.options.accept = accept;
@@ -129,7 +135,7 @@
             pick: { //指定选择文件的按钮容器，不指定则不创建按钮。
                 id: $(this.options.btns.chooseBtn)[0], // 指定选择文件的按钮容器，不指定则不创建按钮。选择器支持 id, class, dom。
                 label: this.options.btns.chooseBtnText || "选择文件",
-                multiple: this.options.multiple || true //是否支持多选能力
+                multiple: this.options.multiple //是否支持多选能力
             },
             accept: accept,
             auto: this.options.auto, //是否自动上传
@@ -174,6 +180,8 @@
         this._uploadAccept();
         //给uploader绑定 uploadError 事件
         this._uploadError();
+        
+        
 
         //判断浏览器是否支持transition属性
         this.supportTransition = (function() { 
@@ -200,6 +208,17 @@
 
         if(this.options.previewInfo.previewWrap){
             $(this.options.previewInfo.previewWrap).addClass('_filelist');
+        }
+         // 解决webuploader0.1.7 在ios中只能使用摄像头拍照的bug
+        if(!this.options.iosOnlyCamera && WebUploader.Base.os.ios){
+            var $btn = $(this.options.btns.chooseBtn),
+                $input = null;
+            setTimeout(function (){
+                $input = $btn.find("input");
+                if($input.attr("capture") == "camera"){
+                    $input.removeAttr("capture");
+                }
+            }, 1800);
         }
     }
     /*给uploader绑定 beforeFileQueued 事件*/
