@@ -82,11 +82,11 @@
     <script src="../../jquery-1.11.3.min.js"></script>
     <script src="../../webuploader.js"></script>
     <script src="../../UploadPreview.js"></script>
-    <input type="hidden" id="uloader_swf" value="../../Uploader.swf" />
+    <a href="../../Uploader.swf" id="uloader_swf"></a>
     <script>
         var uploaderPreview1 = new UploadPreview({
             url: "upload.php",
-            swf: document.getElementById("uloader_swf").value,
+            swf: document.getElementById("uloader_swf").href,
             previewInfo: {
                 previewWrap: "#preview_list1"
             },
