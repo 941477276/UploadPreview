@@ -2,7 +2,7 @@
 * @Author: 李燕南 9411477276@qq.com
 * @Date:   2017-08-15 16:59:16
 * @Last Modified by:   李燕南-941477276@QQ.com
-* @Last Modified time: 2017-12-18 16:15:11
+* @Last Modified time: 2017-12-20 20:06:58
 * @git: https://github.com/941477276/UploadPreview.git
 */
 ;
@@ -135,7 +135,7 @@
             pick: { //指定选择文件的按钮容器，不指定则不创建按钮。
                 id: $(this.options.btns.chooseBtn)[0], // 指定选择文件的按钮容器，不指定则不创建按钮。选择器支持 id, class, dom。
                 label: this.options.btns.chooseBtnText || "选择文件",
-                multiple: this.options.multiple || true //是否支持多选能力
+                multiple: this.options.multiple //是否支持多选能力
             },
             accept: accept,
             auto: this.options.auto, //是否自动上传
