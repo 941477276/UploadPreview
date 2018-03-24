@@ -57,6 +57,9 @@
                         <li><a href="#anchor_event">事件说明</a>
                         </li>
                         <li>
+                            <a href="#anli">常用案例<span class="badge">1.1.0 new</span></a>                            
+                        </li>
+                        <li>
                             <a href="#anchor_method">方法</a>
                             <ul class="nav">
                                 <li>
@@ -87,6 +90,9 @@
                                     <a href="#anchor_setData">setData</a>
                                 </li>
                                 <li>
+                                    <a href="#anchor_setHeader">setHeader</a>
+                                </li>
+                                <li>
                                     <a href="#anchor_getFiles">getFiles</a>
                                 </li>
                                 <li>
@@ -103,6 +109,7 @@
                                 </li>
                             </ul>
                         </li>
+                        
                     </ul>
                 </div>
                 <div class="content-box">
@@ -155,6 +162,7 @@
                             <li>
                                 <code>pictureOnly</code>{Boolean} [可选] <span class="mr-5">[默认: true]
                                 是否只能选择图片，若设置为true则用户在选择文件时就只能选择图片，不能选择其他类型的文件。若设置为false则允许用户选择其他类型的文件
+                                <strong>设置了pictureOnly为true后，设置accept无效</strong>
                             </li>
                             <li>
                                 <code>multiple</code>{Boolean} [可选] <span class="mr-5">[默认: true]
@@ -167,6 +175,10 @@
                             <li>
                                 <code>datas</code>{Object} [可选] <span class="mr-5">[默认: null]
                                 上传时需要给文件添加的额外参数，若设置了参数则每一个文件在上传时都会将<code>datas</code>里面的数据传递给后台
+                            </li>
+                            <li>
+                                <code>header</code>{Object} [可选] <span class="mr-5">[默认: {}]
+                                上传时携带给后台的自定义header
                             </li>
                             <li>
                                 <code>threads</code>{int} [可选] <span class="mr-5">[默认: 3]
@@ -324,6 +336,20 @@
                                 </ul>
                             </li>
                             <li>
+                                <code>accept</code>特别允许上传哪些类型的文件 <a href="demo/accept.html" target="_blank">查看demo</a>
+                                <ul>
+                                    <li>
+                                        <code>extensions</code>{string} [可选] <span class="mr-5">[默认: ""]
+                                        指定允许特别上传哪些后缀名的文件，多个后缀名按<code>,</code>隔开。如：<code>js,html,css</code>、<code>.php,.class,.cs</code>
+                                    </li>
+                                    <li>
+                                        <code>mimeTypes</code>{string} [可选] <span class="mr-5">[默认: ""]
+                                        指定允许特别上传哪些MIME类型的文件，多个MIME类型名按<code>,</code>隔开。如：<code>application/A2L,application/pdf</code>
+                                    </li>
+                                    <li><strong>设置了pictureOnly为true后，设置accept无效</strong></li>
+                                </ul>
+                            </li>
+                            <li>
                                 <code>sendAsBlob</code>{Boolean} [可选] <span class="mr-5">[默认: false]
                                 是否以二进制流的形式发送
                             </li>
@@ -357,6 +383,21 @@
                                 <th class="w-percent-15">事件名</th>
                                 <th class="w-percent-45">参数说明</th>
                                 <th class="w-percent-45">描述</th>
+                            </tr>
+                            <tr>
+                                <td class="w-percent-15">
+                                    <code>beforeFileQueued</code><span class="badge">1.1.0 new</span>
+                                </td>
+                                <td class="w-percent-45">
+                                    <ul>
+                                        <li><code>file</code> {WUFile} WUFile对象</li>
+                                    </ul>
+                                </td>
+                                <td class="w-percent-45">
+                                    在文件被加入队列之前触发。如果该函数返回false，则文件不会被加入队列。
+                                    <br />
+                                    此方法可以用来实现自定义上传文件的类型。<a href="demo/customer-style.html" target="_blank">demo</a>
+                                </td>
                             </tr>
                             <tr>
                                 <td class="w-percent-15">
@@ -476,16 +517,17 @@
                             </tr>
                             <tr>
                                 <td class="w-percent-15">
-                                    <span class="badge">new</span><code>onDelUploaded</code>
+                                    <span class="badge">1.1.0 new</span><code>onDelUploaded</code>
                                 </td>
                                 <td class="w-percent-45">
                                     <ul>
                                         <li><code>id</code> {string} 当前预览框的id</li>
+                                        <li><code>done</code> {function} 一个回调函数，调用此回调函数可以把预览图删掉</li>
                                     </ul>
                                 </td>
                                 <td class="w-percent-45">
-                                    当点击预览框中的"删除"按钮时所触发的函数，如果此函数返回false，则点击"删除"不会删除预览框及文件。
-                                    <strong>该函数必须在文件上传成功后才会触发</strong>
+                                    当点击预览框中的"删除"按钮时所触发的函数，
+                                    <strong>该函数必须在文件上传完成（只要请求成功就会触发）后才会触发</strong>
                                 </td>
                             </tr>
                         </table>
@@ -613,7 +655,7 @@
                     <div>
                         <h3 id="anchor_setData">setData</h3>        
                         <ul class="signature">
-                            <li>uploadPreview.enable() => 当前UploadPreview对象</li>
+                            <li>uploadPreview.setData() => 当前UploadPreview对象</li>
                         </ul>
                         <ul>
                             <li>
@@ -626,6 +668,23 @@
                         <p>给指定文件单独的设置需要上传到服务器端的额外参数。有时候我们在开发类似用户资料填写的功能的时候，需要先提交用户填写的文字信息，提交
                         完成后服务器端返回一个id，然后再上传图片的时候将这个id也传递给后端。<code>setData()</code>方法就是为了解决这一需求的。
                         <a href="demo/setData.html" target="_blank">查看demo</a>
+                        </p>
+                        <div class="mb-30"></div>
+                    </div>
+                    <div>
+                        <h3 id="anchor_setHeader">setHeader</h3>        
+                        <ul class="signature">
+                            <li>uploadPreview.setHeader() => 当前UploadPreview对象</li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <code>header</code> {Object} [必填]  
+                                该参数必须为一个对象，value必须为英文。
+                            </li>
+                        </ul>
+                        <p>
+                            在上传文件之前动态的设置header信息。
+                        <a href="demo/customer-header.html" target="_blank">查看demo</a>
                         </p>
                         <div class="mb-30"></div>
                     </div>
@@ -704,7 +763,39 @@
                         <p>
                             设置预览框中进度条的长度
                         </p>
+                        <div class="mb-30"></div>
                     </div>
+
+                    <div>
+                       <h3 id="anli">案例</h3>
+                       <ol>
+                           <li>
+                               <a href="demo/upload-logo.html" target="_blank">上传头像、logo案例</a>
+                           </li>
+                           <li>
+                               <a href="demo/loop-upload.html" target="_blank">反复上传案例</a>
+                           </li>
+                           <li>
+                               <a href="demo/customer-filter.html" target="_blank">自定义上传文件类型案例</a>
+                           </li>
+                           <li>
+                               <a href="demo/customer-style.html" target="_blank">自定义预览图样式案例</a>
+                           </li>
+                           <li>
+                               <a href="demo/customer-header.html" target="_blank">自定义header案例</a>
+                           </li>
+                           <li>
+                               <a href="demo/ignore.html" target="_blank">排除指定文件类型案例</a>
+                           </li>
+                           <li>
+                               <a href="demo/refresh.html" target="_blank">动态渲染按钮案例</a>
+                           </li>
+                           <li>
+                               <a href="demo/setData.html" target="_blank">动态添加额外参数案例</a>
+                           </li>
+                       </ol>
+                    </div>
+                        
 
                     
                 </div>

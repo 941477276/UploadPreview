@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>上传logo、上传头像示例</title>
+     <link rel="stylesheet" href="../../css/webuploader.css" />
+     <style>
+         .preview-list{
+            width: 120px;
+            min-height: 120px;
+            padding: 20px;
+            border: 1px dashed #666;
+            margin: 50px auto;
+         }
+        
+        .btn-wrap{
+            width: 120px;
+            margin: 20px auto;
+        }
+         .choose-file{
+            width: 200px;
+            height: 80px;
+            margin-bottom: 20px;
+         }
+         h3{
+            width: 1200px;
+            margin: 0 auto;
+         }
+     </style>
+</head>
+<body>
+    <h3>
+        此示例展示的是反复上传1张图片的应用场景，如上传头像、上传logo
+    </h3>
+    <div class="preview-list"> </div>
+
+    <div class="btn-wrap">
+        <div class="choose-file"></div>
+        <button id="upload_btn" type="button">立即上传</button>
+        <button id="retry_btn" type="button">重新上传</button>
+    </div>
+    
+
+
+    <script src="../../jquery-1.11.3.min.js"></script>
+    <script src="../../webuploader.js"></script>
+    <script src="../../UploadPreview.js"></script>
+    <a href="../../Uploader.swf" id="uloader_swf"></a>
+    <script>
+        var uploadPreview =new UploadPreview({
+            url: "basic.html",
+            swf: document.getElementById("uloader_swf").href,
+            previewInfo: {
+                previewWrap: ".preview-list",
+                 /* 设置了此参数为true后，当图片上传完成后(不管服务器是否真正保存了图片)，预览框里面还是会有工具条，但此时工具条里面只有删除按钮，此时点击删除
+                    按钮会触发onDelUploaded回调，而不是onDel回调*/
+                toolBtnShowOnUpload: true
+            },
+            btns: {
+                chooseBtn: ".choose-file",
+                chooseBtnText: "选择LOGO",
+                uploadBtn: document.getElementById("upload_btn"),
+                retryBtn: document.getElementById("retry_btn")
+            },
+            // 上传数量必须设置为1
+            maxFileNum: 1,
+            uploadError: function (file,reason){
+                console.log('上传失败代码：' + reason);
+            },
+            uploadSuccess: function (file,response){
+                //这里的上传成功指的是上传请求发送成功，图片是否真正上传到服务还得根据服务器返回的数据(response)来判断
+                console.log(response);
+            },
+            onDel: function (file){
+                /* 该回调函数在删除预览图时，或删除失败后删除时会触发 */
+                alert("用户删除了预览图！");
+            },
+            onDelUploaded: function (fileid, done) {
+                /* 当图片上传完成后再此点击预览框中的删除按钮会触发此函数，此时可以发送ajax请求把刚刚上传的
+                图片从服务器中删除。然后再调用done()方法把预览图也会一并删除掉 */
+                console.log(fileid);
+            }
+        });
+        //通过uploadPreview.uploader可以获取百度webuplaoder对象的实例
+        console.log(uploadPreview.uploader);
+    </script>
+</body>
+</html>

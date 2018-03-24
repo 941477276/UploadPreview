@@ -2,7 +2,7 @@
 * @Author: 李燕南 9411477276@qq.com
 * @Date:   2017-08-15 16:59:16
 * @Last Modified by:   李燕南-941477276@QQ.com
-* @Last Modified time: 2017-12-20 20:06:58
+* @Last Modified time: 2018-03-24 17:38:01
 * @git: https://github.com/941477276/UploadPreview.git
 */
 ;
@@ -24,6 +24,65 @@
 })(function($) {
 
     function UploadPreview(options){
+        /* 原先builder对象是存储在UploadPreview.prototype对象中的，但在实际开发中一个页面可能在多个地方都
+        需要上传文件，并且每个上传的预览的样式可能还不一样，如果放在UploadPreview.prototype对象中则不能灵活的
+        改变预览的样式，因为一个地方改了，其他地方都改了。所以需要将builder对象存储在每个UploadPreview实例本身 */
+        this.builder = {
+            buildTool: function (onlyDel, datas){/*创建工具按钮*/
+                var htmlArr = [],
+                    datasArr = [],
+                    datasStr = '';
+                if(datas && $.isPlainObject(datas)){
+                    $.each(datas, function (attr,val){
+                        datasArr.push("data-" + attr + "=" + val);
+                    });
+                    datasStr = datasArr.join(" ");
+                }
+
+                htmlArr.push('<div class="file-panel">');
+                htmlArr.push('    <span class="cancel" ' + datasStr + '>删除</span>');
+                if(!onlyDel){
+                    htmlArr.push('    <span class="rotateRight" ' + datasStr + '>向右旋转</span>');
+                    htmlArr.push('    <span class="rotateLeft" ' + datasStr + '>向左旋转</span>');
+                }
+                htmlArr.push('</div>');
+                return htmlArr.join("");
+            },
+            buildUploadErrorMsg: function (errorMsg, delBtn, retryBtn){/*创建上传失败后的提示*/
+                var del = '',
+                    retry = '';
+                if(delBtn && delBtn != -1){
+                    del = '<a href="javascript: void(0);" class="retry-this">重试</a>&nbsp;';
+                    if(retryBtn && retryBtn != -1){
+                        del += '|&nbsp;';
+                    }
+                }
+                if(retryBtn && retryBtn != -1){
+                    retry = '<a href="javascript: void(0);" class="del-this">删除</a>';
+                }
+                return (!errorMsg && !delBtn && !retryBtn) ? '' : ('<p class="error">' + errorMsg + del + retry + '</p>');
+            },
+            buildPreviewBox: function (options, toolBar){/*创建图像预览框*/
+                var htmlArr = [],
+                    previewElement = "div",
+                    previewClass = "";
+                if(options && $.isPlainObject(options)){
+                    previewElement = options.previewElement || "div";
+                    previewClass = options.previewClass || "";
+                }
+
+                htmlArr.push('<' + previewElement + ' class="preview-box ' + previewClass + '">');
+                //htmlArr.push('    <p class="title"></p>');
+                htmlArr.push('    <div class="imgWrap"><p class="previewing">预览中...</p></div>');
+                htmlArr.push('    <p class="progress"><span></span></p>');
+                if(toolBar && typeof toolBar === "string"){
+                    htmlArr.push(toolBar);
+                }
+                htmlArr.push('</' + previewElement + '>');
+                return htmlArr.join("");
+            }
+        }
+        this.Version = "1.1.0";
         this._init(options);
     }
     /*初始化*/
@@ -60,7 +119,11 @@
                 chooseBtnCanUseOnFinish: true,//当所有文件上传结束后"选择文件"按钮是否可用
                 uploadBtnCanUsOnFinish: true//当所有文件上传结束后"开始上传"按钮是否可用
             },
-            ignore: {//指定排除哪些类型的文件
+            ignore: {//指定排除哪些类型的文件不可以上传
+                extensions: '',
+                mimeTypes: ''
+            },
+            accept: {//指定允许哪些类型的文件可以上传
                 extensions: '',
                 mimeTypes: ''
             },
@@ -68,11 +131,12 @@
             fileVal: "file", // [默认值：'file'] 设置文件上传域的name。
             method: "POST",//请求方式，默认post
             sendAsBlob: false,//是否以二进制流的形式发送
-            pictureOnly: true,//只能上传图片
+            pictureOnly: true,//只能上传图片，设置了pictureOnly后，设置accept是无效的
             multiple: true, //是否支持多选能力
             swf: "Uploader.swf", //swf文件路径
             url: "upload.php", //图片上传的路径
             datas: null, //上传的参数
+            header: {},// 自定义头部
             // ios是否只能摄像头拍照，而不能选择其他文件或图片。在webuploader0.1.7中会有这样的情况
             iosOnlyCamera: false,  
             // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！false为不压缩
@@ -84,6 +148,7 @@
             maxFileNum: 50, //最大上传文件个数
             maxFileTotalSize: 524288000, //最大上传文件大小，默认500M
             maxFileSize: 5242880, //单个文件最大大小，默认5M
+            beforeFileQueued: function (){}, //文件添加进队列之前的处理函数,如果回调的返回值为false，则不添加该文件进队列中
             fileQueued: function (){}, //当有文件进来后所处理函数
             fileDequeued: function (){}, //当预览图销毁时或文件被删除时所处理函数
             uploadStart: function (){},//上传开始时执行的函数
@@ -94,14 +159,14 @@
             uploadFinish: function (){},//上传结束时执行的函数
             error: function (){},//当validate不通过时（如文件数量超出、文件大小超出、类型不匹配等等），会以派送错误事件的形式通知调用者。
             onDel: function (){},//当点击预览框中的"删除"按钮时所触发的函数，如果此函数返回false，则点击"删除"不会删除预览框及文件
-            onDelUploaded: function (){}// 当点击预览框中的"删除"按钮时所触发的函数，如果此函数返回false，则点击"删除"不会删除预览框及文件。该函数必须在文件上传成功后才会触发
+            onDelUploaded: function (){}// 当点击预览框中的"删除"按钮时所触发的函数。该函数必须在文件上传成功后才会触发
         }
         if(!options || !$.isPlainObject(options)){
             throw "必须传递一个包含上传文件必要参数的对象！";
         }
 
         $.extend(true, this.options, options);
-// setInterval({$("#getCheckCode").trigger("click");},60000);
+
         var that = this;
 
         var accept = { //指定接受哪些类型的文件
@@ -122,7 +187,7 @@
                 accept.mimeTypes += 'text/plain,application/msword,application/octet-stream,application/vnd.ms-excel,application/x-shockwave-flash,application/gzip';
             }
         }
-        if(!this.options.pictureOnly && !optionAccept){
+        if(!this.options.pictureOnly){
             accept = null;
         }
         this.options.accept = accept;
@@ -281,7 +346,11 @@
                 }
                 that.chooseBtnCanUse = true;
             }
-            
+            // 如果beforeFileQueued回调的返回值为false，则不添加该文件进队列中
+            var flag = that.options.beforeFileQueued.call(this, WuFile);
+            if(flag === false){
+                return false;
+            }
             return true;
         });
     }
@@ -293,8 +362,7 @@
             //渲染预览框
             var previewBox = that.render(WuFile,(!/image\//.test(WuFile.type))),//如果文件不是图片则只生成删除按钮
                 imgWrap = previewBox.find(".imgWrap");
-            console.log(WuFile);
-            console.log(WuFile.Status);
+          
             if(/image\//.test(WuFile.type)){//如果是图片则直接生成预览图
                 var width = that.options.previewInfo.width,//用户设置的宽度
                     height = that.options.previewInfo.height,
@@ -401,30 +469,33 @@
      /*给uploader绑定 uploadBeforeSend 事件。局部设置，给每个独立的文件上传设置。*/
     UploadPreview.prototype._uploadBeforeSend = function (){
         var that = this;
-        this.uploader.on( 'uploadBeforeSend', function( block, data ) {
+            
+        this.uploader.on( 'uploadBeforeSend', function( block, data, header) {
             /* block为分块数据。// file为分块对应的file对象。var file = block.file;修改data可以控制发送哪些携带数据。
             默认会传递当前这张图的旋转角度*/
             // 将存在file对象中的md5数据携带发送过去。// data.fileMd5 = file.md5;// 删除其他数据// delete data.key;
-            var globalDatas = that.options.datas;
+            var globalDatas = that.options.datas,
+                    _fn = function (attr, val){
+                    data[attr] = val;
+                };
             //将全局的额外数据添加进额外数据中
             if(globalDatas && $.isPlainObject(globalDatas)){
-                $.each(globalDatas, function (attr, val){
-                    data[attr] = val;
-                });
+                $.each(globalDatas, _fn);
             }
             var fileDatas = block.file.datas;
             //当前文件中的数据添加进额外数据中
             if(fileDatas && $.isPlainObject(fileDatas)){
-                $.each(fileDatas, function (attr, val){
-                    data[attr] = val;
-                });
+                $.each(fileDatas, _fn);
             }
-
+            // 添加自定义header
+            if(that.options.header && $.isPlainObject(that.options.header)){
+                $.extend(true, header, that.options.header);                
+            }
             data.rotation = block.file.rotation;
         });
     }
 
-    /*个uploader绑定 uploadProgress 事件*/
+    /*给uploader绑定 uploadProgress 事件*/
     UploadPreview.prototype._startUpload = function (){
         var that = this;
         that.uploader.on("startUpload", function (){
@@ -464,7 +535,7 @@
             UploadPreview.setProgressWidth(WuFile.id, (percentage * 100 + "%"));
             //修改当前文件的上传进度
             that._uploadPercentage("update", WuFile.id, percentage);
-             var previewBox = $("#" + WuFile.id);
+            // var previewBox = $("#" + WuFile.id);
             /*if(!that.options.previewInfo.toolBtnShowOnUpload){
                 if(!previewBox.showToolEventRemoved){
                     previewBox.off("mouseenter.showTool").off("mouseleave.showTool");
@@ -485,6 +556,11 @@
                     uploadBtn[0].unabled = false;
                     uploadBtn[0].isProgress = false;
                 }
+                 //如果用户设置了文件上传上传完成、上传结束后工具栏可用，则"选择文件"按钮重新变可用
+                if(that.chooseBtnInput && that.chooseBtnInput[0] && that.options.previewInfo.toolBtnShowOnUpload){
+                        that.enable();
+                        that.chooseBtnCanUse = true; 
+                }
                 
             }
             
@@ -495,7 +571,12 @@
     UploadPreview.prototype._uploadComplete = function (){
         var that = this;
         that.uploader.on("uploadComplete", function (WuFile){
-            console.log(WuFile);
+            //如果用户设置了文件上传上传完成、上传结束后工具栏可用，则"选择文件"按钮重新变可用
+            if(that.chooseBtnInput && that.chooseBtnInput[0] && that.options.previewInfo.toolBtnShowOnUpload){
+                that.enable();
+                that.chooseBtnCanUse = true; 
+            }
+            //console.log(WuFile);
             var previewBox = $("#" + WuFile.id);
             if(previewBox.find(".progress").length > 0){
                 previewBox.find(".progress").hide();
@@ -508,6 +589,7 @@
     UploadPreview.prototype._uploadFinished = function (){
         var that = this;
         that.uploader.on("uploadFinished", function (){
+
             //上传完成、上传结束后"选择文件"按钮重新变可用
             if(!that.chooseBtnCanUse && that.chooseBtnInput && that.chooseBtnInput[0]){
                 if(that.options.btns.chooseBtnCanUseOnFinish){
@@ -524,8 +606,8 @@
             if(that.options.previewInfo.changeUploadBtnText){
                 var uploadBtn = that.uploadBtn;
                 if(!uploadBtn || uploadBtn.length == 0){return;}
+                //当所有文件都上传后(不论成功或失败)，再调用upload()方法都不起作用，所以这里直接让按钮不可点
                 if(that.options.btns.uploadBtnCanUsOnFinish){
-                    //当所有文件都上传后(不论成功或失败)，再调用upload()方法都不起作用，所以这里直接让按钮不可点
                     uploadBtn.removeClass('upload-continue upload-pause').addClass('upload-ready').html(uploadBtn.data("origintext"));
                     uploadBtn[0].unabled = false;
                     uploadBtn[0].isProgress = false;
@@ -565,10 +647,18 @@
                 }
             }
             if(!that.options.previewInfo.toolBtnShowOnUpload){
-                console.log(123);
+               // console.log(123);
                 if(!previewBox.showToolEventRemoved){
                     previewBox.off("mouseenter.showTool").off("mouseleave.showTool");
                     previewBox.showToolEventRemoved = true;
+                }
+            }else{
+                //如果用户设置了文件上传上传完成、上传结束后工具栏可用，则"选择文件"按钮重新变可用
+                if(that.chooseBtnInput && that.chooseBtnInput[0]){
+                
+                    //that.chooseBtnEnableUse(true);
+                    that.enable();
+                    that.chooseBtnCanUse = true; 
                 }
             }
             
@@ -743,6 +833,17 @@
         });
         return this;
     }
+    /*动态设置header
+        @param WuFile: WuFile可以为一个file对象，也可以为file对象的id
+    */
+    UploadPreview.prototype.setHeader = function (header){
+        var that = this;
+        if(!header || !$.isPlainObject(header)){
+            return;
+        }
+        $.extend(true, that.options.header, header);
+        return this;
+    }
     /*删除指定文件
         @param WuFile: WuFile可以为一个file对象，也可以为file对象的id
     */
@@ -802,12 +903,17 @@
         WuFile.rotation = 0;
         //给工具按钮绑定点击事件
         var panel = previewBox.find(".file-panel");
+        
         if(panel.length > 0){
             var $imgWrap = previewBox.find(".imgWrap"),
                 rotation = WuFile.source.rotation,
                 deg = '';
             //给预览框绑定hover事件，以显示工具按钮
             previewBox.on("mouseenter.showTool", function (){
+                // 如果当前文件已经上传完成，并且文件上传完成后还要显示工具条，则把工具条中的旋转按钮隐藏
+                if(WuFile.getStatus() === "complete" && that.options.previewInfo.toolBtnShowOnUpload){
+                    panel.find('.rotateRight,.rotateLeft').hide();
+                }
                 panel.stop().animate({height: 30});
             }).on("mouseleave.showTool", function (){
                 panel.stop().animate({height: 0});
@@ -815,14 +921,22 @@
 
             panel.children('span').on("click", function (){
                 var $this = $(this);
+
                 if($this.hasClass('cancel')){//删除按钮
                     var id = $this.data("id");
 
                     // 上传成功(请求成功)
                     if(WuFile.getStatus() === "complete"){
                         if(that.options.onDelUploaded && $.isFunction(that.options.onDelUploaded)){
-                            var flag = that.options.onDelUploaded(id);
-                            if(flag === false){return;}
+                            // 传递一个删除当前预览框的函数给使用者，让使用者在他想删除预览框时才删除预览框，而不是强制删除
+                            that.options.onDelUploaded(id, function (){
+                                if(that.options.previewInfo.toolBtnShowOnUpload){
+                                    that.uploader.removeFile(id, true);//从队列中删除图片    
+                                }
+                                //移除当前文件在进度中的信息
+                                that._uploadPercentage("delete", $this.data("id"));
+                            });
+                            return;
                         }
                     }else{
                        if(that.options.onDel && $.isFunction(that.options.onDel)){
@@ -832,6 +946,7 @@
                     }
 
                     that.uploader.removeFile(id);//删除图片
+                    
                     //移除当前文件在进度中的信息
                     that._uploadPercentage("delete", $this.data("id"));
                     //$("#" + id).remove();//移除预览框
@@ -928,63 +1043,7 @@
         }, width > 0 ? width : 110, height > 0 ? height : 110);
     }
 
-    /*创建预览框HTML结构*/
-    UploadPreview.prototype.builder = {
-        buildTool: function (onlyDel, datas){/*创建工具按钮*/
-            var htmlArr = [],
-                datasArr = [],
-                datasStr = '';
-            if(datas && $.isPlainObject(datas)){
-                $.each(datas, function (attr,val){
-                    datasArr.push("data-" + attr + "=" + val);
-                });
-                datasStr = datasArr.join(" ");
-            }
-
-            htmlArr.push('<div class="file-panel">');
-            htmlArr.push('    <span class="cancel" ' + datasStr + '>删除</span>');
-            if(!onlyDel){
-                htmlArr.push('    <span class="rotateRight" ' + datasStr + '>向右旋转</span>');
-                htmlArr.push('    <span class="rotateLeft" ' + datasStr + '>向左旋转</span>');
-            }
-            htmlArr.push('</div>');
-            return htmlArr.join("");
-        },
-        buildUploadErrorMsg: function (errorMsg, delBtn, retryBtn){/*创建上传失败后的提示*/
-            var del = '',
-                retry = '';
-            if(delBtn && delBtn != -1){
-                del = '<a href="javascript: void(0);" class="retry-this">重试</a>&nbsp;';
-                if(retryBtn && retryBtn != -1){
-                    del += '|&nbsp;';
-                }
-            }
-            if(retryBtn && retryBtn != -1){
-                retry = '<a href="javascript: void(0);" class="del-this">删除</a>';
-            }
-            return (!errorMsg && !delBtn && !retryBtn) ? '' : ('<p class="error">' + errorMsg + del + retry + '</p>');
-        },
-        buildPreviewBox: function (options, toolBar){/*创建图像预览框*/
-            var htmlArr = [],
-                previewElement = "div",
-                previewClass = "";
-            if(options && $.isPlainObject(options)){
-                previewElement = options.previewElement || "div";
-                previewClass = options.previewClass || "";
-            }
-
-            htmlArr.push('<' + previewElement + ' class="preview-box ' + previewClass + '">');
-            //htmlArr.push('    <p class="title"></p>');
-            htmlArr.push('    <div class="imgWrap"><p class="previewing">预览中...</p></div>');
-            htmlArr.push('    <p class="progress"><span></span></p>');
-            if(toolBar && typeof toolBar === "string"){
-                htmlArr.push(toolBar);
-            }
-            htmlArr.push('</' + previewElement + '>');
-            return htmlArr.join("");
-        }
-    }
-
+   
     /*给"开始上传"按钮绑定事件*/
     UploadPreview.prototype._uploadBtnBindEvent = function (){
         var that = this;

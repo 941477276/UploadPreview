@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>自定义预览框样式</title>
+     <link rel="stylesheet" href="../../css/webuploader.css" />
+     <style>
+         .preview-list{
+            width: 1200px;
+            min-height: 200px;
+            padding: 20px;
+            border: 1px dashed #666;
+            margin: 50px auto;
+         }
+        
+        .btn-wrap{
+            width: 1200px;
+            margin: 20px auto;
+        }
+         .choose-file{
+            width: 200px;
+            height: 80px;
+            margin-bottom: 20px;
+         }
+         h3{
+            width: 1200px;
+            margin: 0 auto;
+         }
+
+        
+
+/*文件上传样式 start*/
+.preview-list._filelist{
+    border: 1px solid #eee;
+    border-bottom: 0;
+    border-right: 0;
+    padding: 5px;
+}
+.preview-item{
+    padding: 5px;
+    border-bottom: 1px solid #eee;
+}
+.preview-item.last{
+    border-bottom: none;
+}
+.preview-list._filelist .preview-box{
+    position: relative;
+    z-index: 5;
+    width: 100px;
+    height: 70px;
+    margin: 0;
+}
+.preview-right{
+    position: relative;
+    z-index: 4;
+    height: 70px;
+    padding-left: 110px;
+    /* background-color: #ccc; */
+}
+.preview-right .file-desc{
+    position: relative;
+    top: 8px;
+    height: 30px;
+    width: 90%;
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 0;
+}
+.preview-right .file-desc:hover{
+    border-color: #66afe9;
+}
+.preview-right .view-file-desc{
+    position: relative;
+    top: 8px;
+    height: 35px;
+    width: 90%;
+    font-size: 13px;
+    overflow: hidden;
+}
+.preview-right .file-size{
+    position: absolute;
+    bottom: 8px;
+    font-size: 13px;
+    color: #333;
+}
+.preview-right .icon-guanbi{
+    position: absolute;
+    top: 5px;
+    right: 0;
+    color: #aaa;
+    cursor: pointer;
+}
+.preview-right .icon-guanbi:hover{
+    color: #000;
+}
+.choose-btn{
+    display: inline-block;
+    width: 41%;
+    height: 50px;
+    line-height: 50px;
+    vertical-align: middle;
+    margin: 10px 0 10px 5%;
+    text-align: center;
+    color: #2e76da;
+    border: 1px dashed #2e76da;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.choose-btn.unabled{
+    border-color: #6c94cd;
+    color: #6c94cd;
+    cursor: default;
+}
+.choose-btn .webuploader-pick{
+    color: #2e76da;
+    background-color: transparent;
+}
+.choose-btn .icon-upload{
+    font-size: 28px;
+}
+.upload-btn,
+.retry-btn{
+    width: 41%;
+    height: 50px;
+    margin-left: 6%;
+}
+/*文件上传样式 end*/
+
+
+
+     </style>
+</head>
+<body>
+    <h3>
+        此示例展示的是自定义预览框样式
+        <br />
+        在实际开发中，预览图的样式可能千变万化。UploadPreview的默认样式肯定是不能满足所有需求的，因此样式自定义就至关重要，而这一功能
+        在UploadPreview第一版的时候就已经可以实现，只是大家不知如何使用。
+    </h3>
+
+    <div class="preview-list _filelist" id="preview_list"></div>
+
+
+    <div class="btn-wrap">
+        <div class="choose-file"></div>
+        <button id="upload_btn" type="button">立即上传</button>
+        <button id="retry_btn" type="button">重新上传</button>
+    </div>
+    
+
+
+    <script src="../../jquery-1.11.3.min.js"></script>
+    <script src="../../webuploader.js"></script>
+    <script src="../../UploadPreview.js"></script>
+    <a href="../../Uploader.swf" id="uloader_swf"></a>
+    <script>
+        var uploadPreview =new UploadPreview({
+            url: "basic.html",
+            swf: document.getElementById("uloader_swf").href,
+            previewInfo: {
+                previewWrap: ".preview-list",
+                 /* 设置了此参数为true后，当图片上传完成后(不管服务器是否真正保存了图片)，预览框里面还是会有工具条，但此时工具条里面只有删除按钮，此时点击删除
+                    按钮会触发onDelUploaded回调，而不是onDel回调*/
+                toolBtnShowOnUpload: true
+            },
+            btns: {
+                chooseBtn: ".choose-file",
+                chooseBtnText: "选择文件",
+                uploadBtn: document.getElementById("upload_btn"),
+                retryBtn: document.getElementById("retry_btn")
+            },
+            maxFileNum: 5,
+            fileQueued: function (file) {
+                var that = this,
+                    $previewItem = $("#" + file.id),
+                    size = file.size / 1048567;//计算后的单位是MB
+                //console.log(file);
+                if (size < 1) {
+                    $previewItem.find(".file-size").html((size * 1024).toFixed(2) + " KB");
+                } else {
+                    $previewItem.find(".file-size").html(size.toFixed(2) + " M");
+                }
+                $previewItem.find(".icon-guanbi").on("click.deleteViewer", function () {
+                    uploadPreview["delete"](file);
+                });
+            },
+            uploadError: function (file,reason){
+                console.log('上传失败代码：' + reason);
+            },
+            uploadSuccess: function (file,response){
+                //这里的上传成功指的是上传请求发送成功，图片是否真正上传到服务还得根据服务器返回的数据(response)来判断
+                console.log(response);
+            },
+            onDel: function (file){
+                /* 该回调函数在删除预览图时，或删除失败后删除时会触发 */
+                alert("用户删除了预览图！");
+            },
+            onDelUploaded: function (fileid, done) {
+                /* 当图片上传完成后再此点击预览框中的删除按钮会触发此函数，此时可以发送ajax请求把刚刚上传的
+                图片从服务器中删除。然后再调用done()方法把预览图也会一并删除掉 */
+
+                done();
+
+                console.log(fileid);
+            },
+            error: function (error){
+                console.log(error);
+                alert(error.msg);
+            }
+        });
+
+        //修改预览框的样式
+        uploadPreview.builder.buildPreviewBox = function (options, toolBar) {
+            var htmlArr = [],
+                previewElement = "div",
+                previewClass = "",
+                html = '';
+            if (options && $.isPlainObject(options)) {
+                previewElement = options.previewElement || "div";
+                previewClass = options.previewClass || "";
+            }
+
+            html += '<' + previewElement + ' class="preview-item clearfix ' + previewClass + '">';
+            // .preview-box下面必须是.imgWrap和toolBar，这个结构不可改变
+            html += '    <div class="preview-box">';
+            html += '        <div class="imgWrap"><p class="previewing">预览中...</p></div>';
+
+            if (toolBar && typeof toolBar === "string") {
+                html += toolBar;
+            }
+
+            html += '    </div>';
+
+            html += '<div class="preview-right">';
+
+            html += '    <input type="text" class="form-control file-desc" placeholder="请填写该文件的描述，如营业执照" />';
+            html += '    <p class="file-size">0kb</p>';
+            html += '    <a href="javascript: void(0);" class="iconfont icon-guanbi" title="删除该文件"></a>';
+            html += '</div>';
+
+            html += '</div>';
+            // 一定要把拼接的html字符串return出去
+            return html;
+        }
+    </script>
+</body>
+</html>

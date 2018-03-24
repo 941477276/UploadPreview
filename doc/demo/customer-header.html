@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>上传时携带自定义头部数据示例</title>
+     <link rel="stylesheet" href="../../css/webuploader.css" />
+     <style>
+         .preview-list{
+            width: 1200px;
+            min-height: 200px;
+            padding: 20px;
+            border: 1px dashed #666;
+            margin: 50px auto;
+         }
+        
+        .btn-wrap{
+            width: 1200px;
+            margin: 20px auto;
+        }
+         .choose-file{
+            width: 200px;
+            height: 80px;
+            margin-bottom: 20px;
+         }
+         h3{
+            width: 1200px;
+            margin: 0 auto;
+         }
+     </style>
+</head>
+<body>
+    <h3>
+        此示例展示的是上传时携带自定义header
+    </h3>
+    <div class="preview-list"> </div>
+
+    <div class="btn-wrap">
+        <div class="choose-file"></div>
+        <button id="upload_btn" type="button">立即上传</button>
+        <button id="retry_btn" type="button">重新上传</button>
+        <button id="set_header_btn" type="button">动态设置header</button>
+    </div>
+    
+
+
+    <script src="../../jquery-1.11.3.min.js"></script>
+    <script src="../../webuploader.js"></script>
+    <script src="../../UploadPreview.js"></script>
+    <a href="../../Uploader.swf" id="uloader_swf"></a>
+    <script>
+        var uploadPreview =new UploadPreview({
+            url: "basic.html",
+            swf: document.getElementById("uloader_swf").href,
+            previewInfo: {
+                previewWrap: ".preview-list"
+            },
+            btns: {
+                chooseBtn: ".choose-file",
+                chooseBtnText: "选择LOGO",
+                uploadBtn: document.getElementById("upload_btn"),
+                retryBtn: document.getElementById("retry_btn")
+            },
+            maxFileNum: 5,
+            // 设置自定义头部
+            header: {
+                "author_qq": "941477276",
+                "author_email": "941477276@qq.com"
+            },
+            uploadStart: function (){
+                alert("请按f12打开开发者工具，然后在network中查看请求头！");
+            },
+            uploadError: function (file,reason){
+                console.log('上传失败代码：' + reason);
+            },
+            uploadSuccess: function (file,response){
+                //这里的上传成功指的是上传请求发送成功，图片是否真正上传到服务还得根据服务器返回的数据(response)来判断
+                console.log(response);
+            }
+        });
+        $("#set_header_btn").on("click", function (){
+            var name = prompt("请输入自定义头，必须英文！");
+            var val = prompt("请输入自定义头的值，必须英文！");
+            var header = {};
+            header[name] = val;
+            uploadPreview.setHeader(header);
+        });
+    </script>
+</body>
+</html>
