@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>自定义上传的文件类型</title>
+     <link rel="stylesheet" href="../../css/webuploader.css" />
+     <style>
+         .preview-list{
+            width: 1200px;
+            min-height: 200px;
+            padding: 20px;
+            border: 1px dashed #666;
+            margin: 50px auto;
+         }
+        
+        .btn-wrap{
+            width: 1200px;
+            margin: 20px auto;
+        }
+         .choose-file{
+            width: 200px;
+            height: 80px;
+            margin-bottom: 20px;
+         }
+         h3{
+            width: 1200px;
+            margin: 0 auto;
+         }
+     </style>
+</head>
+<body>
+    <h3>
+        此示例展示的是自定义上传的文件类型
+        <br />
+        UploadPreview允许只上传图片、也可以上传任何文件，同时还可以通过设置ignore属性来排除指定类型或后缀名的文件
+<pre style="color: green;">
+    //指定排除哪些类型的文件
+    ignore: {
+        // 排除的文件的后缀名，多个之间按逗号隔开。（extensions、mimeTypes只填一个即可）
+        extensions: '',
+        // 排除的文件的mime类型，多个之间按逗号隔开
+        mimeTypes: ''
+    }
+</pre>
+同时还可以通过设置accept属性来指定可以上传哪些类型的文件
+<pre style="color: green;">
+    //指定排除哪些类型的文件
+    accept: {
+        // 允许上传的文件的后缀名，多个之间按逗号隔开。（extensions、mimeTypes只填一个即可）
+        extensions: '',
+        // 允许上传的文件的mime类型，多个之间按逗号隔开
+        mimeTypes: ''
+    }
+</pre>
+但在实际开发中，这些还是不够灵活，不能满足所有场景，因此从UploadPreview 1.1.0版本开始可以自定义允许上传的文件的类型
+    </h3>
+    <div class="preview-list"> </div>
+
+    <div class="btn-wrap">
+        <div class="choose-file"></div>
+        <button id="upload_btn" type="button">立即上传</button>
+        <button id="retry_btn" type="button">重新上传</button>
+    </div>
+    
+
+
+    <script src="../../jquery-1.11.3.min.js"></script>
+    <script src="../../webuploader.js"></script>
+    <script src="../../UploadPreview.js"></script>
+    <a href="../../Uploader.swf" id="uloader_swf"></a>
+    <script>
+        var uploadPreview =new UploadPreview({
+            url: "basic.html",
+            swf: document.getElementById("uloader_swf").href,
+            previewInfo: {
+                previewWrap: ".preview-list",
+                 /* 设置了此参数为true后，当图片上传完成后(不管服务器是否真正保存了图片)，预览框里面还是会有工具条，但此时工具条里面只有删除按钮，此时点击删除
+                    按钮会触发onDelUploaded回调，而不是onDel回调*/
+                toolBtnShowOnUpload: true
+            },
+            btns: {
+                chooseBtn: ".choose-file",
+                chooseBtnText: "选择文件",
+                uploadBtn: document.getElementById("upload_btn"),
+                retryBtn: document.getElementById("retry_btn")
+            },
+            maxFileNum: 5,
+            // 设置了pictureOnly后，设置accept是无效的
+            pictureOnly: false,
+            beforeFileQueued: function (file){
+                if(file.name.indexOf(".jpg") != -1 || file.name.indexOf(".png") != -1 || file.name.indexOf(".doc") != -1){
+                    alert("不允许上传.jpg、.png、.doc文件");
+                    // 如果beforeFileQueued回调函数返回false，则当前选中的文件不会被上传
+                    return false;
+                }
+            },
+            uploadError: function (file,reason){
+                console.log('上传失败代码：' + reason);
+            },
+            uploadSuccess: function (file,response){
+                //这里的上传成功指的是上传请求发送成功，图片是否真正上传到服务还得根据服务器返回的数据(response)来判断
+                console.log(response);
+            },
+            onDel: function (file){
+                /* 该回调函数在删除预览图时，或删除失败后删除时会触发 */
+                alert("用户删除了预览图！");
+            },
+            onDelUploaded: function (fileid, done) {
+                /* 当图片上传完成后再此点击预览框中的删除按钮会触发此函数，此时可以发送ajax请求把刚刚上传的
+                图片从服务器中删除。然后再调用done()方法把预览图也会一并删除掉 */
+
+                done();
+
+                console.log(fileid);
+            },
+            error: function (error){
+                console.log(error);
+                alert(error.msg);
+            }
+        });
+        //通过uploadPreview.uploader可以获取百度webuplaoder对象的实例
+        console.log(uploadPreview.uploader);
+    </script>
+</body>
+</html>

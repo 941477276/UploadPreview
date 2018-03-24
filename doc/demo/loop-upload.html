@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>循环上传示例</title>
+     <link rel="stylesheet" href="../../css/webuploader.css" />
+     <style>
+         .preview-list{
+            width: 1200px;
+            min-height: 200px;
+            padding: 20px;
+            border: 1px dashed #666;
+            margin: 50px auto;
+         }
+        
+        .btn-wrap{
+            width: 1200px;
+            margin: 20px auto;
+        }
+         .choose-file{
+            width: 200px;
+            height: 80px;
+            margin-bottom: 20px;
+         }
+         h3{
+            width: 1200px;
+            margin: 0 auto;
+         }
+     </style>
+</head>
+<body>
+    <h3>
+        有时候我们会有这样的需求：<br />
+         <ol>
+             <li>只能上传5个文件</li>
+             <li>用户选择文件后立即上传到服务器</li>
+             <li>用户可以删除掉刚刚上传的文件，然后选择新的文件再上传</li>
+             <li>用户删除掉刚刚上传的文件时需要把预览图删掉，同时也要把服务器中的文件删掉</li>
+         </ol>
+         如此往复操作，在之前的UploadPreview中是做不到的，因为webuploader的maxFileNum参数不可以动态修改，后面经过网友指点找到了一种可行的方法。
+         因此从Uploadpreview 1.1.0版本开始可以实现这种需求了。
+         <br />
+         下面示例中总共可以上传3个文件！
+    </h3>
+    <div class="preview-list"> </div>
+
+    <div class="btn-wrap">
+        <div class="choose-file"></div>
+        <button id="upload_btn" type="button">立即上传</button>
+        <button id="retry_btn" type="button">重新上传</button>
+    </div>
+    
+
+
+    <script src="../../jquery-1.11.3.min.js"></script>
+    <script src="../../webuploader.js"></script>
+    <script src="../../UploadPreview.js"></script>
+    <a href="../../Uploader.swf" id="uloader_swf"></a>
+    <script>
+        var uploadPreview =new UploadPreview({
+            url: "basic.html",
+            swf: document.getElementById("uloader_swf").href,
+            previewInfo: {
+                previewWrap: ".preview-list",
+                 /* 设置了此参数为true后，当图片上传完成后(不管服务器是否真正保存了图片)，预览框里面还是会有工具条，但此时工具条里面只有删除按钮，此时点击删除
+                    按钮会触发onDelUploaded回调，而不是onDel回调*/
+                toolBtnShowOnUpload: true
+            },
+            btns: {
+                chooseBtn: ".choose-file",
+                chooseBtnText: "选择LOGO",
+                uploadBtn: document.getElementById("upload_btn"),
+                retryBtn: document.getElementById("retry_btn")
+            },
+            maxFileNum: 3,
+            uploadError: function (file,reason){
+                console.log('上传失败代码：' + reason);
+            },
+            uploadSuccess: function (file,response){
+                //这里的上传成功指的是上传请求发送成功，图片是否真正上传到服务还得根据服务器返回的数据(response)来判断
+                console.log(response);
+            },
+            onDel: function (file){
+                /* 该回调函数在删除预览图时，或删除失败后删除时会触发 */
+                alert("用户删除了预览图！");
+            },
+            onDelUploaded: function (fileid, done) {
+                /* 当图片上传完成后再此点击预览框中的删除按钮会触发此函数，此时可以发送ajax请求把刚刚上传的
+                图片从服务器中删除。然后再调用done()方法把预览图也会一并删除掉 */
+
+                done();
+
+                console.log(fileid);
+            },
+            error: function (error){
+                console.log(error);
+                alert(error.msg);
+            }
+        });
+        //通过uploadPreview.uploader可以获取百度webuplaoder对象的实例
+        console.log(uploadPreview.uploader);
+    </script>
+</body>
+</html>
