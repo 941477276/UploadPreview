@@ -2,7 +2,7 @@
 * @Author: 李燕南 9411477276@qq.com
 * @Date:   2017-08-15 16:59:16
 * @Last Modified by:   李燕南-941477276@QQ.com
-* @Last Modified time: 2018-03-24 17:38:01
+* @Last Modified time: 2018-04-19 17:32:49
 * @git: https://github.com/941477276/UploadPreview.git
 */
 ;
@@ -52,13 +52,14 @@
                 var del = '',
                     retry = '';
                 if(delBtn && delBtn != -1){
-                    del = '<a href="javascript: void(0);" class="retry-this">重试</a>&nbsp;';
+                    del = '<a href="javascript: void(0);" class="del-this">删除</a>';
+                    
                     if(retryBtn && retryBtn != -1){
                         del += '|&nbsp;';
                     }
                 }
                 if(retryBtn && retryBtn != -1){
-                    retry = '<a href="javascript: void(0);" class="del-this">删除</a>';
+                    retry = '<a href="javascript: void(0);" class="retry-this">重试</a>&nbsp;';
                 }
                 return (!errorMsg && !delBtn && !retryBtn) ? '' : ('<p class="error">' + errorMsg + del + retry + '</p>');
             },
